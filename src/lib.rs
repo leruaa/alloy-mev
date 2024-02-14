@@ -1,5 +1,7 @@
 use alloy_transport_http::Http;
 
+mod reqwest;
+
 #[derive(Debug, Clone)]
 pub struct Flashbots<T, S> {
     http: Http<T>,
