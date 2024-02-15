@@ -32,7 +32,7 @@ impl<S: Signer + Clone + 'static> Flashbots<reqwest::Client, S> {
             let resp = this
                 .http
                 .client()
-                .post(this.http.url())
+                .post("https://relay.flashbots.net")
                 .header("x-flashbots-signature", header_val)
                 .body(bytes)
                 .send()
