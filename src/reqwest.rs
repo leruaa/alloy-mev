@@ -2,7 +2,7 @@ use std::task::{Context, Poll};
 
 use crate::Flashbots;
 use alloy_json_rpc::{RequestPacket, ResponsePacket};
-use alloy_primitives::{keccak256, B256};
+use alloy_primitives::{hex, keccak256};
 use alloy_signer::Signer;
 use alloy_transport::{TransportError, TransportErrorKind, TransportFut};
 use reqwest::header::HeaderValue;
@@ -13,28 +13,27 @@ impl<S: Signer + Clone + 'static> Flashbots<reqwest::Client, S> {
         let this = self.clone();
 
         Box::pin(async move {
-            let bytes =
-                serde_json::to_vec(&req).map_err(|err| TransportError::deser_err(err, ""))?;
+            let body = serde_json::to_vec(&req).map_err(TransportError::ser_err)?;
 
             let signature = this
                 .signer
-                .sign_message(format!("0x{:x}", B256::from(keccak256(&bytes))).as_bytes())
+                .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
                 .await
                 .map_err(TransportErrorKind::custom)?;
-
-            let header_val = HeaderValue::from_str(&format!(
-                "{:?}:0x{}",
-                this.signer.address(),
-                signature.inner()
-            ))
-            .expect("Header contains invalid characters");
 
             let resp = this
                 .http
                 .client()
                 .post("https://relay.flashbots.net")
-                .header("x-flashbots-signature", header_val)
-                .body(bytes)
+                .header(
+                    "X-Flashbots-Signature",
+                    format!(
+                        "{:?}:0x{}",
+                        this.signer.address(),
+                        hex::encode(signature.as_bytes())
+                    ),
+                )
+                .body(body)
                 .send()
                 .await
                 .map_err(TransportErrorKind::custom)?;
