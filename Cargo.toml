@@ -6,10 +6,22 @@ edition = "2021"
 [dependencies]
 alloy-primitives = "0.6"
 alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
+alloy-network = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
+alloy-providers = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
 alloy-transport = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
 alloy-transport-http = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
 alloy-signer = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
+mev-share = { git = "https://github.com/paradigmxyz/mev-share-rs" }
 hyper = { version = "1.1", features = ["client"] }
 tower = "0.4"
 reqwest = { version = "0.11" }
 serde_json = "1.0"
+async-trait = "0.1"
+
+[patch."https://github.com/alloy-rs/alloy"]
+alloy-json-rpc = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-network = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-providers = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-transport = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-transport-http = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-signer = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }

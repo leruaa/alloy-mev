@@ -1,12 +1,12 @@
 use std::task::{Context, Poll};
 
-use crate::Flashbots;
+use crate::{Flashbots, FlashbotsLayer};
 use alloy_json_rpc::{RequestPacket, ResponsePacket};
 use alloy_primitives::{hex, keccak256};
 use alloy_signer::Signer;
 use alloy_transport::{TransportError, TransportErrorKind, TransportFut};
-use reqwest::header::HeaderValue;
-use tower::Service;
+use alloy_transport_http::Http;
+use tower::{Layer, Service};
 
 impl<S: Signer + Clone + 'static> Flashbots<reqwest::Client, S> {
     fn request(&self, req: RequestPacket) -> TransportFut<'static> {
@@ -70,5 +70,13 @@ where
             },
             other => self.http.call(other),
         }
+    }
+}
+
+impl<Signer> Layer<Http<reqwest::Client>> for FlashbotsLayer<Signer> {
+    type Service = Flashbots<reqwest::Client, Signer>;
+
+    fn layer(&self, inner: Http<reqwest::Client>) -> Self::Service {
+        Flashbots::new(inner, self.signer.clone())
     }
 }
