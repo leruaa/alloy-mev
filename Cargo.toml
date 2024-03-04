@@ -19,9 +19,12 @@ serde_json = "1.0"
 async-trait = "0.1"
 
 [patch."https://github.com/alloy-rs/alloy"]
-alloy-json-rpc = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
-alloy-network = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
-alloy-providers = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
-alloy-transport = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
-alloy-transport-http = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
-alloy-signer = { git = "https://github.com/alloy-rs//alloy", branch = "prestwich/tx-builder" }
+alloy-json-rpc = { path = "../alloy/crates/json-rpc" }
+alloy-network = { path = "../alloy/crates/network" }
+alloy-providers = { path = "../alloy/crates/providers" }
+alloy-transport = { path = "../alloy/crates/transport" }
+alloy-transport-http = { path = "../alloy/crates/transport-http" }
+alloy-signer = { path = "../alloy/crates/signer" }
+alloy-rpc-client = { path = "../alloy/crates/rpc-client" }
+alloy-consensus = { path = "../alloy/crates/consensus" }
+alloy-rpc-types = { path = "../alloy/crates/rpc-types" }
