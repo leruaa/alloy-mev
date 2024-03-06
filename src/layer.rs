@@ -15,6 +15,7 @@ impl<Signer> FlashbotsLayer<Signer> {
     }
 }
 
+#[cfg(feature = "reqwest")]
 impl<Signer> Layer<Http<reqwest::Client>> for FlashbotsLayer<Signer> {
     type Service = FlashbotsHttp<reqwest::Client, Signer>;
 

@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use alloy_transport_http::Http;
 
+#[cfg(feature = "reqwest")]
 mod reqwest;
 
 #[derive(Debug, Clone)]

@@ -3,6 +3,10 @@ name = "alloy-flashbots"
 version = "0.0.1"
 edition = "2021"
 
+[features]
+default = ["reqwest"]
+reqwest = ["dep:reqwest"]
+
 [dependencies]
 alloy-primitives = "0.6"
 alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
@@ -14,7 +18,7 @@ alloy-signer = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
 mev-share = { git = "https://github.com/paradigmxyz/mev-share-rs" }
 hyper = { version = "1.1", features = ["client"] }
 tower = "0.4"
-reqwest = { version = "0.11" }
+reqwest = { version = "0.11", optional = true }
 serde_json = "1.0"
 async-trait = "0.1"
 
