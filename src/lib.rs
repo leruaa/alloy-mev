@@ -1,3 +1,5 @@
+#![doc = include_str!("../README.md")]
+
 mod http;
 mod layer;
 mod provider_ext;

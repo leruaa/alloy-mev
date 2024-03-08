@@ -8,6 +8,7 @@ use mev_share::rpc::{
 
 use crate::http::FlashbotsHttp;
 
+/// Extension trait for sending and simulate bundles.
 #[async_trait]
 pub trait FlashbotsProviderExt<N, C, S>
 where
