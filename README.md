@@ -10,5 +10,27 @@ An [Alloy] transport to send transaction bundles via [Flashbots].
 Add `alloy-flashbots` to your `Cargo.toml`.
 
 ```toml
-ethers-flashbots = "0.1"
+alloy-flashbots = "0.1"
 ```
+
+## Usage
+
+TBD
+
+## TODO
+
+- [x] Extension trait
+- [x] Reqwest HTTP transport
+- [ ] Hyper HTTP transport
+- [ ] Rewrite RPC types from `mev-share-rs` ones that depends on `ethers`
+- [ ] Add a method to build a `BundleItem` from a `TransactionRequest` on the extension trait
+
+## Credits
+
+- [alloy]
+- [ethers-flashbots]
+- [mev-share-rs]
+
+[alloy]: https://github.com/alloy-rs
+[ethers-flashbots]: https://github.com/onbjerg/ethers-flashbots
+[mev-share-rs]: https://github.com/paradigmxyz/mev-share-rs
