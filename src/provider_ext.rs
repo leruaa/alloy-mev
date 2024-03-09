@@ -2,11 +2,11 @@ use alloy_network::Network;
 use alloy_providers::Provider;
 use alloy_transport::{Transport, TransportResult};
 use async_trait::async_trait;
-use mev_share::rpc::{
-    SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
-};
 
-use crate::http::FlashbotsHttp;
+use crate::{
+    http::FlashbotsHttp,
+    rpc::{SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse},
+};
 
 /// Extension trait for sending and simulate bundles.
 #[async_trait]
