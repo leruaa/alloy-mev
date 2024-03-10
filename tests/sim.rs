@@ -1,20 +1,22 @@
-use std::{env, sync::Arc};
+use std::env;
 
-use alloy_flashbots::{FlashbotsLayer, FlashbotsProviderExt};
+use alloy_flashbots::{
+    rpc::{BundleItem, Inclusion, SendBundleRequest, SimBundleOverrides},
+    FlashbotsLayer, FlashbotsProviderExt,
+};
 use alloy_network::eip2718::Encodable2718;
 use alloy_network::Ethereum;
 use alloy_network::EthereumSigner;
 use alloy_network::TransactionBuilder;
 use alloy_primitives::address;
 use alloy_primitives::U256;
+use alloy_providers::Provider;
 use alloy_providers::ProviderBuilder;
 use alloy_rpc_client::RpcClient;
 use alloy_rpc_types::TransactionRequest;
 use alloy_signer::LocalWallet;
+use alloy_signer::Signer;
 use dotenv::dotenv;
-use mev_share::rpc::BundleItem;
-use mev_share::rpc::SendBundleRequest;
-use mev_share::rpc::SimBundleOverrides;
 
 #[tokio::test]
 async fn test_sim_bundle() {
@@ -24,17 +26,28 @@ async fn test_sim_bundle() {
     let signer = EthereumSigner::from(wallet.clone());
 
     let client = RpcClient::builder()
-        .layer(FlashbotsLayer::new(Arc::new(wallet)))
+        .layer(FlashbotsLayer::new(wallet.clone()))
         .reqwest_http(eth_rpc.parse().unwrap());
 
     let provider = ProviderBuilder::<_, Ethereum>::new().on_client(client);
 
-    let envelope = TransactionRequest::default()
+    let block_number = provider.get_block_number().await.unwrap();
+
+    let mut tx = TransactionRequest::default()
         .to(Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045")))
-        .value(U256::from(1000000000))
-        .build(&signer)
+        .value(U256::from(1000000000));
+
+    let nonce = provider
+        .get_transaction_count(wallet.address(), None)
         .await
         .unwrap();
+
+    tx = tx.nonce(nonce.to());
+
+    provider.populate_gas_eip1559(&mut tx, None).await.unwrap();
+    provider.populate_gas(&mut tx, None).await.unwrap();
+
+    let envelope = tx.build(&signer).await.unwrap();
 
     let bundle_body = vec![BundleItem::Tx {
         tx: envelope.encoded_2718().into(),
@@ -43,6 +56,7 @@ async fn test_sim_bundle() {
 
     let bundle = SendBundleRequest {
         bundle_body,
+        inclusion: Inclusion::at_block(block_number + 1),
         ..Default::default()
     };
 
