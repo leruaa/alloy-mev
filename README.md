@@ -23,7 +23,7 @@ TBD
 - [x] Reqwest HTTP transport
 - [ ] Hyper HTTP transport
 - [x] Rewrite RPC types from `mev-share-rs` ones that depends on `ethers`
-- [ ] Add a method to build a `BundleItem` from a `TransactionRequest` on the extension trait
+- [x] Add a method to build a `BundleItem` from a `TransactionRequest` on the extension trait
 
 ## Credits
 

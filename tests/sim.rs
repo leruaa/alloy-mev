@@ -1,13 +1,11 @@
 use std::env;
 
 use alloy_flashbots::{
-    rpc::{BundleItem, Inclusion, SendBundleRequest, SimBundleOverrides},
+    rpc::{Inclusion, SendBundleRequest, SimBundleOverrides},
     FlashbotsLayer, FlashbotsProviderExt,
 };
-use alloy_network::eip2718::Encodable2718;
 use alloy_network::Ethereum;
 use alloy_network::EthereumSigner;
-use alloy_network::TransactionBuilder;
 use alloy_primitives::address;
 use alloy_primitives::U256;
 use alloy_providers::Provider;
@@ -47,15 +45,11 @@ async fn test_sim_bundle() {
     provider.populate_gas_eip1559(&mut tx, None).await.unwrap();
     provider.populate_gas(&mut tx, None).await.unwrap();
 
-    let envelope = tx.build(&signer).await.unwrap();
-
-    let bundle_body = vec![BundleItem::Tx {
-        tx: envelope.encoded_2718().into(),
-        can_revert: false,
-    }];
-
     let bundle = SendBundleRequest {
-        bundle_body,
+        bundle_body: vec![provider
+            .build_bundle_item(tx, false, &signer)
+            .await
+            .unwrap()],
         inclusion: Inclusion::at_block(block_number + 1),
         ..Default::default()
     };
