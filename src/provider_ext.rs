@@ -19,14 +19,21 @@ where
     C: Send + Sync,
     S: Send + Sync,
 {
+    /// Submit a bundle to the relay. It takes in a bundle and provides
+    /// a bundle hash as a return value.
     async fn send_bundle(&self, bundle: SendBundleRequest) -> TransportResult<SendBundleResponse>;
 
+    /// Similar to `send_bundle` but instead of submitting a bundle to the
+    /// relay, it returns a simulation result. Only fully matched bundles
+    /// can be simulated.
     async fn sim_bundle(
         &self,
         bundle: SendBundleRequest,
         sim_overrides: SimBundleOverrides,
     ) -> TransportResult<SimBundleResponse>;
 
+    /// Build a [`BundleItem`] from a [`TransactionRequest`], using the given
+    /// [`NetworkSigner`] to sign the `tx`
     async fn build_bundle_item<NS: NetworkSigner<N>>(
         &self,
         tx: <N as Network>::TransactionRequest,
