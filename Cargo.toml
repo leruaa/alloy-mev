@@ -1,7 +1,16 @@
 [package]
 name = "alloy-flashbots"
 version = "0.0.1"
+authors = ["leruaa"]
+license = "MIT"
 edition = "2021"
+readme = "./README.md"
+documentation = "https://docs.rs/alloy-flashbots"
+repository = "https://github.com/leruaa/alloy-flashbots"
+homepage = "https://github.com/leruaa/alloy-flashbots"
+description = """
+Alloy transport to send transaction bundles via Flashbots.
+"""
 
 [features]
 default = ["reqwest"]
@@ -29,4 +38,3 @@ tokio = { version = "1", features = ["rt", "macros"] }
 alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
 alloy-consensus = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
 alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-
