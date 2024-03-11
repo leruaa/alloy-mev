@@ -9,13 +9,13 @@ reqwest = ["dep:reqwest"]
 
 [dependencies]
 alloy-primitives = "0.6"
-alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-network = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-providers = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-transport = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-transport-http = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-signer = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
+alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-network = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-providers = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-transport = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-transport-http = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-signer = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
 serde = "1.0"
 hyper = { version = "1.1", features = ["client"] }
 tower = "0.4"
@@ -26,17 +26,7 @@ async-trait = "0.1"
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt", "macros"] }
-alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-consensus = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
-alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "11b8031" }
+alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-consensus = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
 
-[patch."https://github.com/alloy-rs/alloy"]
-alloy-json-rpc = { path = "../alloy/crates/json-rpc" }
-alloy-network = { path = "../alloy/crates/network" }
-alloy-providers = { path = "../alloy/crates/providers" }
-alloy-transport = { path = "../alloy/crates/transport" }
-alloy-transport-http = { path = "../alloy/crates/transport-http" }
-alloy-signer = { path = "../alloy/crates/signer" }
-alloy-rpc-client = { path = "../alloy/crates/rpc-client" }
-alloy-consensus = { path = "../alloy/crates/consensus" }
-alloy-rpc-types = { path = "../alloy/crates/rpc-types" }
