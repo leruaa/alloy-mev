@@ -1,18 +1,16 @@
 use std::env;
 
+use alloy::network::{Ethereum, EthereumSigner};
+use alloy::providers::{Provider, ProviderBuilder};
+use alloy::rpc::client::RpcClient;
+use alloy::rpc::types::eth::TransactionRequest;
+use alloy::signers::LocalWallet;
 use alloy_flashbots::{
     rpc::{Inclusion, SendBundleRequest, SimBundleOverrides},
     FlashbotsLayer, FlashbotsProviderExt, FlashbotsTransactionBuilderExt,
 };
-use alloy_network::Ethereum;
-use alloy_network::EthereumSigner;
 use alloy_primitives::address;
 use alloy_primitives::U256;
-use alloy_providers::Provider;
-use alloy_providers::ProviderBuilder;
-use alloy_rpc_client::RpcClient;
-use alloy_rpc_types::TransactionRequest;
-use alloy_signer::LocalWallet;
 use dotenv::dotenv;
 
 #[tokio::test]

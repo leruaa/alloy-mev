@@ -22,12 +22,12 @@ use alloy_flashbots::{
     rpc::{Inclusion, SendBundleRequest},
     FlashbotsLayer, FlashbotsProviderExt, FlashbotsTransactionBuilderExt,
 };
-use alloy_network::{Ethereum, EthereumSigner};
 use alloy_primitives::{address, U256};
-use alloy_providers::ProviderBuilder;
-use alloy_rpc_client::RpcClient;
-use alloy_rpc_types::TransactionRequest;
-use alloy_signer::LocalWallet;
+use alloy::network::{Ethereum, EthereumSigner};
+use alloy::providers::ProviderBuilder;
+use alloy::rpc::client::RpcClient;
+use alloy::rpc::types::eth::TransactionRequest;
+use alloy::signers::LocalWallet;
 use anyhow::Result;
 use dotenv::dotenv;
 

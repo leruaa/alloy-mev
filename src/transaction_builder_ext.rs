@@ -1,4 +1,4 @@
-use alloy_network::{
+use alloy::network::{
     eip2718::Encodable2718, BuilderResult, Network, NetworkSigner, TransactionBuilder,
 };
 use async_trait::async_trait;

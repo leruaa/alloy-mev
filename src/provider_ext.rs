@@ -1,6 +1,6 @@
-use alloy_network::Network;
-use alloy_providers::Provider;
-use alloy_transport::{Transport, TransportResult};
+use alloy::network::Network;
+use alloy::providers::Provider;
+use alloy::transports::{Transport, TransportResult};
 use async_trait::async_trait;
 
 use crate::{

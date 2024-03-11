@@ -18,13 +18,17 @@ reqwest = ["dep:reqwest"]
 
 [dependencies]
 alloy-primitives = "0.6"
-alloy-json-rpc = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-network = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-providers = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-transport = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-transport-http = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-signer = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e", features = [
+    "rpc",
+    "json-rpc",
+    "rpc-types",
+    "rpc-types-eth",
+    "network",
+    "providers",
+    "transports",
+    "transport-http",
+    "signers",
+] }
 serde = "1.0"
 hyper = { version = "1.1", features = ["client"] }
 tower = "0.4"
@@ -35,6 +39,7 @@ async-trait = "0.1"
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt", "macros"] }
-alloy-rpc-client = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-consensus = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
-alloy-rpc-types = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e" }
+alloy = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e", features = [
+    "rpc-client",
+    "consensus",
+] }

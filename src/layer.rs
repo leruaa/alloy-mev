@@ -1,4 +1,4 @@
-use alloy_transport_http::Http;
+use alloy::transports::http::Http;
 use tower::Layer;
 
 use crate::FlashbotsHttp;
