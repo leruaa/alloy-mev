@@ -10,7 +10,7 @@ An [Alloy] transport to send transaction bundles via [Flashbots].
 Add `alloy-flashbots` to your `Cargo.toml`.
 
 ```toml
-alloy-flashbots = "0.1"
+alloy-flashbots = { git = "https://github.com/leruaa/alloy-flashbots" }
 ```
 
 ## Usage
