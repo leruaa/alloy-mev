@@ -15,7 +15,63 @@ alloy-flashbots = "0.1"
 
 ## Usage
 
-TBD
+```rust
+use std::env;
+
+use alloy_flashbots::{
+    rpc::{Inclusion, SendBundleRequest},
+    FlashbotsLayer, FlashbotsProviderExt, FlashbotsTransactionBuilderExt,
+};
+use alloy_network::{Ethereum, EthereumSigner};
+use alloy_primitives::{address, U256};
+use alloy_providers::ProviderBuilder;
+use alloy_rpc_client::RpcClient;
+use alloy_rpc_types::TransactionRequest;
+use alloy_signer::LocalWallet;
+use anyhow::Result;
+use dotenv::dotenv;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    dotenv().ok();
+    let eth_rpc = env::var("ETH_HTTP_RPC")?;
+
+    // This is your searcher identity
+    let bundle_signer = LocalWallet::random();
+
+    // This signs transactions
+    let wallet = EthereumSigner::from(LocalWallet::random());
+
+    // Build a RPC client with the Flashbots layer...
+    let client = RpcClient::builder()
+        .layer(FlashbotsLayer::new(bundle_signer))
+        .reqwest_http(eth_rpc.parse()?);
+
+    // ... and a provider
+    let provider = ProviderBuilder::<_, Ethereum>::new().on_client(client);
+
+    // Pay Vitalik using a Flashbots bundle!
+    let mut tx = TransactionRequest::default()
+        .to(Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))) // vitalik.eth
+        .value(U256::from(1000000000));
+
+    // Don't forget to populate nonce and gas fields on the tx ;)
+
+    // Build a bundle...
+    let bundle = SendBundleRequest {
+        bundle_body: vec![tx.build_bundle_item(false, &wallet).await?],
+        inclusion: Inclusion::at_block(provider.get_block_number().await? + 1),
+        ..Default::default()
+    };
+
+    // ... and send it!
+    let response = provider.send_bundle(bundle).await?;
+
+    println!("Bundle hash: {}", response.bundle_hash);
+
+    Ok(())
+}
+```
 
 ## TODO
 
