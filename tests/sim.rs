@@ -2,7 +2,7 @@ use std::env;
 
 use alloy_flashbots::{
     rpc::{Inclusion, SendBundleRequest, SimBundleOverrides},
-    FlashbotsLayer, FlashbotsProviderExt,
+    FlashbotsLayer, FlashbotsProviderExt, FlashbotsTransactionBuilderExt,
 };
 use alloy_network::Ethereum;
 use alloy_network::EthereumSigner;
@@ -13,7 +13,6 @@ use alloy_providers::ProviderBuilder;
 use alloy_rpc_client::RpcClient;
 use alloy_rpc_types::TransactionRequest;
 use alloy_signer::LocalWallet;
-use alloy_signer::Signer;
 use dotenv::dotenv;
 
 #[tokio::test]
@@ -46,10 +45,7 @@ async fn test_sim_bundle() {
     provider.populate_gas(&mut tx, None).await.unwrap();
 
     let bundle = SendBundleRequest {
-        bundle_body: vec![provider
-            .build_bundle_item(tx, false, &signer)
-            .await
-            .unwrap()],
+        bundle_body: vec![tx.build_bundle_item(false, &signer).await.unwrap()],
         inclusion: Inclusion::at_block(block_number + 1),
         ..Default::default()
     };
