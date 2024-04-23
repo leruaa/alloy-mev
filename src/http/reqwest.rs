@@ -2,13 +2,15 @@ use std::task::{Context, Poll};
 
 use alloy::rpc::json_rpc::{RequestPacket, ResponsePacket};
 use alloy::signers::Signer;
-use alloy::transports::{TransportError, TransportErrorKind, TransportFut};
-use alloy_primitives::{hex, keccak256};
+use alloy::{
+    primitives::{hex, keccak256},
+    transports::{TransportError, TransportErrorKind, TransportFut},
+};
 use tower::Service;
 
 use crate::FlashbotsHttp;
 
-impl<S: Signer + Clone + 'static> FlashbotsHttp<reqwest::Client, S> {
+impl<S: Signer + Clone + Send + Sync + 'static> FlashbotsHttp<reqwest::Client, S> {
     fn request(&self, req: RequestPacket) -> TransportFut<'static> {
         let this = self.clone();
 
@@ -50,7 +52,7 @@ impl<S: Signer + Clone + 'static> FlashbotsHttp<reqwest::Client, S> {
 
 impl<S> Service<RequestPacket> for FlashbotsHttp<reqwest::Client, S>
 where
-    S: Signer + Clone + 'static,
+    S: Signer + Clone + Send + Sync + 'static,
 {
     type Response = ResponsePacket;
     type Error = TransportError;

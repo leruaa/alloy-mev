@@ -1,7 +1,9 @@
 use std::collections::HashSet;
 
-use alloy::rpc::types::eth::{BlockId, Log};
-use alloy_primitives::{Address, Bytes, TxHash, B256, U64};
+use alloy::{
+    primitives::{Address, Bytes, TxHash, B256, U64},
+    rpc::types::eth::{BlockId, Log},
+};
 use serde::{Deserialize, Serialize};
 
 /// A bundle of transactions to send to the matchmaker.

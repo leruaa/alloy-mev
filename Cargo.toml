@@ -17,8 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 
 [dependencies]
-alloy-primitives = "0.6"
-alloy = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e", features = [
+alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "rpc",
     "json-rpc",
     "rpc-types",
@@ -32,14 +31,15 @@ alloy = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e", features =
 serde = "1.0"
 hyper = { version = "1.1", features = ["client"] }
 tower = "0.4"
-reqwest = { version = "0.11", optional = true }
+reqwest = { version = "0.12", optional = true }
 serde_json = "1.0"
 async-trait = "0.1"
 
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt", "macros"] }
-alloy = { git = "https://github.com/alloy-rs/alloy", rev = "05d0d0e", features = [
+alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "rpc-client",
     "consensus",
+    "signer-wallet",
 ] }
