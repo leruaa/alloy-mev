@@ -40,26 +40,23 @@ async fn main() -> Result<()> {
     let bundle_signer = LocalWallet::random();
 
     // This signs transactions
-    let wallet = EthereumSigner::from(LocalWallet::random());
+    let tx_signer = EthereumSigner::from(LocalWallet::random());
 
-    // Build a RPC client with the Flashbots layer...
-    let client = RpcClient::builder()
-        .layer(FlashbotsLayer::new(bundle_signer))
-        .reqwest_http(eth_rpc.parse()?);
-
-    // ... and a provider
-    let provider = ProviderBuilder::<_, Ethereum>::new().on_client(client);
+    // Build a provider with Flashbots
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .signer(tx_signer.clone())
+        .on_http_with_flashbots(eth_rpc.parse()?, bundle_signer.clone());
 
     // Pay Vitalik using a Flashbots bundle!
-    let mut tx = TransactionRequest::default()
+    let tx = TransactionRequest::default()
+        .from(tx_signer.default_signer_address())
         .to(Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))) // vitalik.eth
         .value(U256::from(1000000000));
 
-    // Don't forget to populate nonce and gas fields on the tx ;)
-
     // Build a bundle...
     let bundle = SendBundleRequest {
-        bundle_body: vec![tx.build_bundle_item(false, &wallet).await?],
+        bundle_body: vec![provider.build_bundle_item(tx, false).await?],
         inclusion: Inclusion::at_block(provider.get_block_number().await? + 1),
         ..Default::default()
     };
