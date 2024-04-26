@@ -14,6 +14,7 @@ pub trait FlashbotsProviderExt<N>
 where
     N: Network,
 {
+    /// Build a bundle item from a transaction request.
     async fn build_bundle_item(
         &self,
         tx: N::TransactionRequest,

@@ -9,7 +9,10 @@ use url::Url;
 
 use crate::{FlashbotsHttp, FlashbotsLayer};
 
+/// Extension trait for building a Flashbots capable provider.
 pub trait FlashbotsProviderBuilderExt<L, F, N> {
+    /// Build this provider with an Flashbots transport, relying on a Reqwest
+    /// HTTP transport.
     #[cfg(feature = "reqwest")]
     fn on_http_with_flashbots<S>(self, url: Url, signer: S) -> F::Provider
     where

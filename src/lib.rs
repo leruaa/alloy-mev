@@ -10,12 +10,16 @@
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 
 mod http;
-mod layer;
-mod provider_builder_ext;
-mod provider_ext;
-pub mod rpc;
-
 pub use http::FlashbotsHttp;
+
+mod layer;
 pub use layer::FlashbotsLayer;
+
+mod provider_builder_ext;
 pub use provider_builder_ext::FlashbotsProviderBuilderExt;
+
+mod provider_ext;
 pub use provider_ext::FlashbotsProviderExt;
+
+/// RPC types.
+pub mod rpc;
