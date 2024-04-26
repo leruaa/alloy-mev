@@ -8,6 +8,7 @@ use crate::FlashbotsHttp;
 ///
 /// [`Transport`]: https://alloy-rs.github.io/alloy/alloy_transport/trait.Transport.html
 /// [`ClientBuilder`]: https://alloy-rs.github.io/alloy/alloy_rpc_client/builder/struct.ClientBuilder.html
+#[derive(Debug)]
 pub struct FlashbotsLayer<S> {
     signer: S,
 }
@@ -17,7 +18,7 @@ impl<S> FlashbotsLayer<S> {
     /// the `X-Flashbots-Signature` header.
     ///
     /// [`Signer`]:  https://alloy-rs.github.io/alloy/alloy_signer/trait.Signer.html
-    pub fn new(signer: S) -> Self {
+    pub const fn new(signer: S) -> Self {
         Self { signer }
     }
 }

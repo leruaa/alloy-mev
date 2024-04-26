@@ -29,7 +29,7 @@ pub struct SendBundleRequest {
 }
 
 /// The version of the MEV-share API to use.
-#[derive(Deserialize, Debug, Serialize, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, Default, PartialEq, Eq)]
 pub enum ProtocolVersion {
     #[default]
     #[serde(rename = "beta-1")]
@@ -41,7 +41,7 @@ pub enum ProtocolVersion {
 }
 
 /// Data used by block builders to check if the bundle should be considered for inclusion.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Inclusion {
     /// The first block the bundle is valid for.
@@ -97,7 +97,7 @@ pub struct Validity {
 
 /// Specifies the minimum percent of a given bundle's earnings to redistribute
 /// for it to be included in a builder's block.
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct Refund {
     /// The index of the transaction in the bundle.
@@ -108,7 +108,7 @@ pub struct Refund {
 
 /// Specifies what addresses should receive what percent of the overall refund for this bundle,
 /// if it is enveloped by another bundle (eg. a searcher backrun).
-#[derive(Clone, Debug, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct RefundConfig {
     /// The address to refund.
@@ -130,7 +130,7 @@ pub struct Privacy {
 }
 
 /// Hints on what data should be shared about the bundle and its transactions
-#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, Copy, Clone, Serialize, Deserialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "snake_case")]
 pub enum PrivacyHint {
     /// The calldata of the bundle's transactions should be shared.
@@ -148,7 +148,7 @@ pub enum PrivacyHint {
 }
 
 /// Response from the matchmaker after sending a bundle.
-#[derive(Deserialize, Debug, Serialize, Clone, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SendBundleResponse {
     /// Hash of the bundle bodies.
@@ -192,7 +192,7 @@ pub struct SimBundleLogs {
 }
 
 /// Optional fields to override simulation state.
-#[derive(Deserialize, Debug, Serialize, Clone, Default, PartialEq, Eq)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize, Default, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]
 pub struct SimBundleOverrides {
     /// Block used for simulation state. Defaults to latest block.

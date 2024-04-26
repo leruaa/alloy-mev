@@ -13,7 +13,7 @@ pub struct FlashbotsHttp<T, S> {
 
 impl<T, S> FlashbotsHttp<T, S> {
     /// Create a new [`FlashbotsHttp`] transport.
-    pub fn new(http: Http<T>, signer: S) -> Self {
+    pub const fn new(http: Http<T>, signer: S) -> Self {
         Self { http, signer }
     }
 }
