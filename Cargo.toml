@@ -19,6 +19,7 @@ reqwest = ["dep:reqwest"]
 [dependencies]
 alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "rpc",
+    "rpc-client",
     "json-rpc",
     "rpc-types",
     "rpc-types-eth",
