@@ -1,13 +1,14 @@
-use alloy::network::eip2718::Encodable2718;
-use alloy::network::Network;
-use alloy::providers::fillers::{FillProvider, TxFiller};
-use alloy::providers::Provider;
-use alloy::transports::{Transport, TransportErrorKind, TransportResult};
+use alloy::{
+    network::eip2718::Encodable2718,
+    network::Network,
+    providers::fillers::{FillProvider, TxFiller},
+    providers::Provider,
+    transports::{Transport, TransportErrorKind, TransportResult},
+};
 use async_trait::async_trait;
 
 use crate::rpc::BundleItem;
 use crate::rpc::{SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse};
-
 /// Extension trait for sending and simulate bundles.
 #[async_trait]
 pub trait FlashbotsProviderExt<N>

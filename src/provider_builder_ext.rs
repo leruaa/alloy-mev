@@ -1,7 +1,7 @@
 use alloy::{
     network::Network,
     providers::{fillers::TxFiller, ProviderBuilder, ProviderLayer, RootProvider},
-    rpc::client::RpcClient,
+    rpc::client::ClientBuilder,
     signers::Signer,
     transports::Transport,
 };
@@ -41,7 +41,7 @@ impl<L, F, N> FlashbotsProviderBuilderExt<L, F, N> for ProviderBuilder<L, F, N> 
         S: Signer + Clone + Send + Sync,
         N: Network,
     {
-        let client = RpcClient::builder()
+        let client = ClientBuilder::default()
             .layer(FlashbotsLayer::new(signer))
             .http(url);
 

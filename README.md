@@ -25,7 +25,6 @@ use alloy_flashbots::{
 use alloy_primitives::{address, U256};
 use alloy::network::{Ethereum, EthereumSigner};
 use alloy::providers::ProviderBuilder;
-use alloy::rpc::client::RpcClient;
 use alloy::rpc::types::eth::TransactionRequest;
 use alloy::signers::LocalWallet;
 use anyhow::Result;
