@@ -1,4 +1,5 @@
 use alloy::transports::http::Http;
+use url::Url;
 
 #[cfg(feature = "reqwest")]
 mod reqwest;
@@ -6,14 +7,19 @@ mod reqwest;
 /// An Alloy `Transport` that handle `mev_sendBundle` and `mev_simBundle`
 /// requests and delegates all others to the inner `Transport`.
 #[derive(Debug, Clone)]
-pub struct FlashbotsHttp<T, S> {
+pub struct MevHttp<T, S> {
+    mev_share_url: Url,
     http: Http<T>,
-    signer: S,
+    signer: Option<S>,
 }
 
-impl<T, S> FlashbotsHttp<T, S> {
-    /// Create a new [`FlashbotsHttp`] transport.
-    pub const fn new(http: Http<T>, signer: S) -> Self {
-        Self { http, signer }
+impl<T, S> MevHttp<T, S> {
+    /// Create a new [`MevHttp`] transport.
+    pub const fn new(mev_share_url: Url, http: Http<T>, signer: Option<S>) -> Self {
+        Self {
+            mev_share_url,
+            http,
+            signer,
+        }
     }
 }

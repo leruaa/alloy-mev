@@ -6,9 +6,9 @@ use alloy::primitives::U256;
 use alloy::providers::{Provider, ProviderBuilder};
 use alloy::rpc::types::eth::TransactionRequest;
 use alloy::signers::wallet::LocalWallet;
-use alloy_flashbots::{
-    rpc::{Inclusion, SendBundleRequest, SimBundleOverrides},
-    FlashbotsProviderBuilderExt, FlashbotsProviderExt,
+use alloy_mev::{
+    rpc::mev::{Inclusion, SendBundleRequest, SimBundleOverrides},
+    MevCapableProviderBuilderExt, MevProviderExt,
 };
 use dotenv::dotenv;
 
@@ -22,7 +22,9 @@ async fn test_sim_bundle() {
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .signer(signer)
-        .on_http_with_flashbots(eth_rpc.parse().unwrap(), wallet.clone());
+        .with_bundle_managment()
+        .bundle_signer(wallet.clone())
+        .on_http(eth_rpc.parse().unwrap());
 
     let block_number = provider.get_block_number().await.unwrap();
 

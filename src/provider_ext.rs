@@ -7,11 +7,12 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-use crate::rpc::BundleItem;
-use crate::rpc::{SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse};
+use crate::rpc::mev::{
+    BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
+};
 /// Extension trait for sending and simulate bundles.
 #[async_trait]
-pub trait FlashbotsProviderExt<N>
+pub trait MevProviderExt<N>
 where
     N: Network,
 {
@@ -37,7 +38,7 @@ where
 }
 
 #[async_trait]
-impl<F, P, T, N> FlashbotsProviderExt<N> for FillProvider<F, P, T, N>
+impl<F, P, T, N> MevProviderExt<N> for FillProvider<F, P, T, N>
 where
     F: TxFiller<N>,
     P: Provider<T, N>,

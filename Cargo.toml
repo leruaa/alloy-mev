@@ -1,15 +1,15 @@
 [package]
-name = "alloy-flashbots"
-version = "0.0.1"
+name = "alloy-mev"
+version = "0.1.0"
 authors = ["leruaa"]
 license = "MIT"
 edition = "2021"
 readme = "./README.md"
-documentation = "https://docs.rs/alloy-flashbots"
-repository = "https://github.com/leruaa/alloy-flashbots"
-homepage = "https://github.com/leruaa/alloy-flashbots"
+documentation = "https://docs.rs/alloy-mev"
+repository = "https://github.com/leruaa/alloy-mev"
+homepage = "https://github.com/leruaa/alloy-mev"
 description = """
-Alloy transport to send transaction bundles via Flashbots.
+Easily send transaction bundles using Alloy.
 """
 
 [features]
@@ -30,7 +30,7 @@ alloy = { git = "https://github.com/alloy-rs/alloy", features = [
     "signers",
 ] }
 serde = "1.0"
-hyper = { version = "1.1", features = ["client"] }
+hyper = { version = "1.1", features = ["client"], optional = true }
 tower = "0.4"
 reqwest = { version = "0.12", optional = true }
 url = "2.5"

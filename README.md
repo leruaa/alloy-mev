@@ -1,16 +1,15 @@
-# Alloy Flashbots
+# Alloy MEV
 
-An [Alloy] transport to send transaction bundles via [Flashbots].
+Easily send transaction bundles using [Alloy].
 
 [Alloy]: https://github.com/alloy-rs/alloy
-[Flashbots]: https://docs.flashbots.net/
 
 ## Installation
 
-Add `alloy-flashbots` to your `Cargo.toml`.
+Add `alloy-mev` to your `Cargo.toml`.
 
 ```toml
-alloy-flashbots = { git = "https://github.com/leruaa/alloy-flashbots" }
+alloy-mev = { git = "https://github.com/leruaa/alloy-mev" }
 ```
 
 ## Usage
@@ -18,9 +17,9 @@ alloy-flashbots = { git = "https://github.com/leruaa/alloy-flashbots" }
 ```rust
 use std::env;
 
-use alloy_flashbots::{
+use alloy_mev::{
     rpc::{Inclusion, SendBundleRequest},
-    FlashbotsLayer, FlashbotsProviderExt, FlashbotsTransactionBuilderExt,
+    MevLayer, MevProviderExt, MevCapableProviderBuilderExt,
 };
 use alloy_primitives::{address, U256};
 use alloy::network::{Ethereum, EthereumSigner};
@@ -41,13 +40,15 @@ async fn main() -> Result<()> {
     // This signs transactions
     let tx_signer = EthereumSigner::from(LocalWallet::random());
 
-    // Build a provider with Flashbots
+    // Build a provider with MEV
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .signer(tx_signer.clone())
-        .on_http_with_flashbots(eth_rpc.parse()?, bundle_signer.clone());
+        .with_bundle_managment()
+        .bundle_signer(bundle_signer)
+        .on_http(eth_rpc.parse()?);
 
-    // Pay Vitalik using a Flashbots bundle!
+    // Pay Vitalik using a MEV-Share bundle!
     let tx = TransactionRequest::default()
         .from(tx_signer.default_signer_address())
         .to(Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))) // vitalik.eth
