@@ -22,10 +22,10 @@ use alloy_mev::{
     MevLayer, MevProviderExt, MevCapableProviderBuilderExt,
 };
 use alloy_primitives::{address, U256};
-use alloy::network::{Ethereum, EthereumSigner};
+use alloy::network::{Ethereum, EthereumWallet};
 use alloy::providers::ProviderBuilder;
 use alloy::rpc::types::eth::TransactionRequest;
-use alloy::signers::LocalWallet;
+use alloy::signers::local::LocalSigner;
 use anyhow::Result;
 use dotenv::dotenv;
 
@@ -35,10 +35,10 @@ async fn main() -> Result<()> {
     let eth_rpc = env::var("ETH_HTTP_RPC")?;
 
     // This is your searcher identity
-    let bundle_signer = LocalWallet::random();
+    let bundle_signer = LocalSigner::random();
 
     // This signs transactions
-    let tx_signer = EthereumSigner::from(LocalWallet::random());
+    let tx_signer = EthereumWallet::from(LocalSigner::random());
 
     // Build a provider with MEV
     let provider = ProviderBuilder::new()
