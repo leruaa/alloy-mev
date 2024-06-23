@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 
 [dependencies]
-alloy = { git = "https://github.com/alloy-rs/alloy", features = [
+alloy = { version = "0.1", features = [
     "rpc",
     "rpc-client",
     "json-rpc",
@@ -40,8 +40,8 @@ async-trait = "0.1"
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt", "macros"] }
-alloy = { git = "https://github.com/alloy-rs/alloy", features = [
+alloy = { version = "0.1", features = [
     "rpc-client",
     "consensus",
-    "signer-wallet",
+    "signer-local",
 ] }
