@@ -22,7 +22,7 @@ async fn test_sim_bundle() {
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .wallet(wallet.clone())
-        .with_bundle_managment()
+        .with_bundle_management()
         .bundle_signer(signer.clone())
         .on_http(eth_rpc.parse().unwrap());
 

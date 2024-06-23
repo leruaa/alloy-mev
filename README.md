@@ -44,7 +44,7 @@ async fn main() -> Result<()> {
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .signer(tx_signer.clone())
-        .with_bundle_managment()
+        .with_bundle_management()
         .bundle_signer(bundle_signer)
         .on_http(eth_rpc.parse()?);
 
