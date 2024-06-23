@@ -9,7 +9,7 @@ Easily send transaction bundles using [Alloy].
 Add `alloy-mev` to your `Cargo.toml`.
 
 ```toml
-alloy-mev = { git = "https://github.com/leruaa/alloy-mev" }
+alloy-mev = "0.1"
 ```
 
 ## Usage
@@ -69,14 +69,6 @@ async fn main() -> Result<()> {
     Ok(())
 }
 ```
-
-## TODO
-
-- [x] Extension trait
-- [x] Reqwest HTTP transport
-- [ ] Hyper HTTP transport
-- [x] Rewrite RPC types from `mev-share-rs` ones that depends on `ethers`
-- [x] Add a method to build a `BundleItem` from a `TransactionRequest`
 
 ## Credits
 
