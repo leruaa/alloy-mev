@@ -124,9 +124,10 @@ pub struct Privacy {
     /// Hints on what data should be shared about the bundle and its transactions
     #[serde(skip_serializing_if = "HashSet::is_empty")]
     pub hints: HashSet<PrivacyHint>,
-    /// The addresses of the builders that should be allowed to see the bundle/transaction.
+    /// Names of the builders that should be allowed to see the bundle/transaction.
+    /// https://github.com/flashbots/dowg/blob/main/builder-registrations.json
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub builders: Vec<Address>,
+    pub builders: Vec<String>,
 }
 
 /// Hints on what data should be shared about the bundle and its transactions
