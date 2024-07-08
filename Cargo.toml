@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 
 [dependencies]
-alloy = { version = "0.1", features = [
+alloy = { version = "0.1.4", features = [
     "rpc",
     "rpc-client",
     "json-rpc",
