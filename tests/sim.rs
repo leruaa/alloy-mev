@@ -4,12 +4,12 @@ use alloy::network::EthereumWallet;
 use alloy::primitives::address;
 use alloy::primitives::U256;
 use alloy::providers::{Provider, ProviderBuilder};
-use alloy::rpc::types::eth::TransactionRequest;
 use alloy::signers::local::PrivateKeySigner;
-use alloy_mev::{
-    rpc::mev::{Inclusion, SendBundleRequest, SimBundleOverrides},
-    MevCapableProviderBuilderExt, MevProviderExt,
-};
+use alloy_mev::{MevCapableProviderBuilderExt, MevProviderExt};
+use alloy_rpc_types::mev::Inclusion;
+use alloy_rpc_types::mev::SendBundleRequest;
+use alloy_rpc_types::mev::SimBundleOverrides;
+use alloy_rpc_types::TransactionRequest;
 use dotenv::dotenv;
 
 #[tokio::test]

@@ -21,15 +21,13 @@ alloy = { version = "0.1.4", features = [
     "rpc",
     "rpc-client",
     "json-rpc",
-    "rpc-types",
-    "rpc-types-eth",
     "network",
     "providers",
     "transports",
     "transport-http",
     "signers",
 ] }
-serde = "1.0"
+alloy-rpc-types = { version = "0.1.4", features = ["eth", "mev"] }
 hyper = { version = "1.1", features = ["client"], optional = true }
 tower = "0.4"
 reqwest = { version = "0.12", optional = true }

@@ -19,7 +19,7 @@ pub struct MevCapableProviderBuilder<L, F, N, S> {
 
 impl<L, F, N, S> MevCapableProviderBuilder<L, F, N, S> {
     /// Creates a new [`MevCapableProviderBuilder`].
-    pub fn new(provider_builder: ProviderBuilder<L, F, N>) -> Self {
+    pub const fn new(provider_builder: ProviderBuilder<L, F, N>) -> Self {
         Self {
             provider_builder,
             layer: MevLayer::<S>::new(),

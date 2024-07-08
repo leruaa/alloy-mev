@@ -23,6 +23,3 @@ pub use mev_capable_provider_builder_ext::MevCapableProviderBuilderExt;
 
 mod provider_ext;
 pub use provider_ext::MevProviderExt;
-
-/// RPC types.
-pub mod rpc;

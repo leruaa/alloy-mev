@@ -5,11 +5,11 @@ use alloy::{
     providers::Provider,
     transports::{Transport, TransportErrorKind, TransportResult},
 };
-use async_trait::async_trait;
-
-use crate::rpc::mev::{
+use alloy_rpc_types::mev::{
     BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
 };
+use async_trait::async_trait;
+
 /// Extension trait for sending and simulate bundles.
 #[async_trait]
 pub trait MevProviderExt<N>
