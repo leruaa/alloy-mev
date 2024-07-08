@@ -21,5 +21,5 @@ pub use mev_capable_provider_builder::MevCapableProviderBuilder;
 mod mev_capable_provider_builder_ext;
 pub use mev_capable_provider_builder_ext::MevCapableProviderBuilderExt;
 
-mod provider_ext;
-pub use provider_ext::MevProviderExt;
+mod mev_share_provider_ext;
+pub use mev_share_provider_ext::MevShareProviderExt;

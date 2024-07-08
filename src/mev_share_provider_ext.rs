@@ -12,7 +12,7 @@ use async_trait::async_trait;
 
 /// Extension trait for sending and simulate bundles.
 #[async_trait]
-pub trait MevProviderExt<N>
+pub trait MevShareProviderExt<N>
 where
     N: Network,
 {
@@ -38,7 +38,7 @@ where
 }
 
 #[async_trait]
-impl<F, P, T, N> MevProviderExt<N> for FillProvider<F, P, T, N>
+impl<F, P, T, N> MevShareProviderExt<N> for FillProvider<F, P, T, N>
 where
     F: TxFiller<N>,
     P: Provider<T, N>,

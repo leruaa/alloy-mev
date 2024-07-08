@@ -5,7 +5,7 @@ use alloy::primitives::address;
 use alloy::primitives::U256;
 use alloy::providers::{Provider, ProviderBuilder};
 use alloy::signers::local::PrivateKeySigner;
-use alloy_mev::{MevCapableProviderBuilderExt, MevProviderExt};
+use alloy_mev::{MevCapableProviderBuilderExt, MevShareProviderExt};
 use alloy_rpc_types::mev::Inclusion;
 use alloy_rpc_types::mev::SendBundleRequest;
 use alloy_rpc_types::mev::SimBundleOverrides;
