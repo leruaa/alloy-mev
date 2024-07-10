@@ -1,36 +1,47 @@
 use alloy::{
-    network::eip2718::Encodable2718,
-    network::Network,
-    providers::fillers::{FillProvider, TxFiller},
-    providers::Provider,
-    transports::{Transport, TransportErrorKind, TransportResult},
+    network::{eip2718::Encodable2718, Network},
+    providers::{
+        fillers::{FillProvider, TxFiller},
+        Provider,
+    },
+    rpc::client::RpcCall,
+    signers::{k256::ecdsa::SigningKey, local::LocalSigner, Signer},
+    transports::{http::Http, TransportErrorKind, TransportResult},
 };
 use alloy_rpc_types::mev::{
     BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
 };
 use async_trait::async_trait;
 
-/// Extension trait for sending and simulate bundles.
+use crate::MevHttp;
+
+/// Extension trait for sending and simulate MEV-Share bundles.
 #[async_trait]
 pub trait MevShareProviderExt<N>
 where
     N: Network,
 {
-    /// Build a bundle item from a transaction request.
+    /// Builds a bundle item from a transaction request.
     async fn build_bundle_item(
         &self,
         tx: N::TransactionRequest,
         can_revert: bool,
     ) -> TransportResult<BundleItem>;
 
-    /// Submit a bundle to the relay. It takes in a bundle and provides
-    /// a bundle hash as a return value.
-    async fn send_bundle(&self, bundle: SendBundleRequest) -> TransportResult<SendBundleResponse>;
+    /// Submits a bundle to the MEV-Share matchmaker. It takes in a bundle and
+    /// provides a bundle hash as a return value.
+    async fn send_mev_bundle<S>(
+        &self,
+        bundle: SendBundleRequest,
+        signer: S,
+    ) -> TransportResult<SendBundleResponse>
+    where
+        S: Signer + Clone + Send + Sync + 'static;
 
     /// Similar to `send_bundle` but instead of submitting a bundle to the
-    /// relay, it returns a simulation result. Only fully matched bundles
+    /// matchmaker, it returns a simulation result. Only fully matched bundles
     /// can be simulated.
-    async fn sim_bundle(
+    async fn sim_mev_bundle(
         &self,
         bundle: SendBundleRequest,
         sim_overrides: SimBundleOverrides,
@@ -38,11 +49,10 @@ where
 }
 
 #[async_trait]
-impl<F, P, T, N> MevShareProviderExt<N> for FillProvider<F, P, T, N>
+impl<F, P, N> MevShareProviderExt<N> for FillProvider<F, P, Http<reqwest::Client>, N>
 where
     F: TxFiller<N>,
-    P: Provider<T, N>,
-    T: Transport + Clone,
+    P: Provider<Http<reqwest::Client>, N>,
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
@@ -65,17 +75,40 @@ where
         }
     }
 
-    async fn send_bundle(&self, bundle: SendBundleRequest) -> TransportResult<SendBundleResponse> {
-        self.client().request("mev_sendBundle", (bundle,)).await
+    async fn send_mev_bundle<S>(
+        &self,
+        bundle: SendBundleRequest,
+        signer: S,
+    ) -> TransportResult<SendBundleResponse>
+    where
+        S: Signer + Clone + Send + Sync + 'static,
+    {
+        let request = self.client().make_request("mev_sendBundle", (bundle,));
+
+        RpcCall::new(
+            request,
+            MevHttp::flashbots(self.client().transport().clone(), signer),
+        )
+        .await
     }
 
-    async fn sim_bundle(
+    async fn sim_mev_bundle(
         &self,
         bundle: SendBundleRequest,
         sim_overrides: SimBundleOverrides,
     ) -> TransportResult<SimBundleResponse> {
-        self.client()
-            .request("mev_simBundle", (bundle, sim_overrides))
-            .await
+        let request = self
+            .client()
+            .make_request("mev_simBundle", (bundle, sim_overrides));
+
+        RpcCall::new(
+            request,
+            MevHttp::<_, LocalSigner<SigningKey>>::new(
+                "https://relay.flashbots.net".parse().unwrap(),
+                self.client().transport().clone(),
+                None,
+            ),
+        )
+        .await
     }
 }

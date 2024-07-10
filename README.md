@@ -19,7 +19,6 @@ use std::env;
 
 use alloy_mev::{
     rpc::{Inclusion, SendBundleRequest},
-    MevLayer, MevProviderExt, MevCapableProviderBuilderExt,
 };
 use alloy_primitives::{address, U256};
 use alloy::network::{Ethereum, EthereumWallet};
@@ -44,8 +43,6 @@ async fn main() -> Result<()> {
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .signer(tx_signer.clone())
-        .with_bundle_management()
-        .bundle_signer(bundle_signer)
         .on_http(eth_rpc.parse()?);
 
     // Pay Vitalik using a MEV-Share bundle!
@@ -62,7 +59,7 @@ async fn main() -> Result<()> {
     };
 
     // ... and send it!
-    let response = provider.send_bundle(bundle).await?;
+    let response = provider.send_mev_bundle(bundle, bundle_signer).await?;
 
     println!("Bundle hash: {}", response.bundle_hash);
 

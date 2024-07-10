@@ -5,7 +5,7 @@ use alloy::primitives::address;
 use alloy::primitives::U256;
 use alloy::providers::{Provider, ProviderBuilder};
 use alloy::signers::local::PrivateKeySigner;
-use alloy_mev::{MevCapableProviderBuilderExt, MevShareProviderExt};
+use alloy_mev::MevShareProviderExt;
 use alloy_rpc_types::mev::Inclusion;
 use alloy_rpc_types::mev::SendBundleRequest;
 use alloy_rpc_types::mev::SimBundleOverrides;
@@ -22,8 +22,6 @@ async fn test_sim_bundle() {
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
         .wallet(wallet.clone())
-        .with_bundle_management()
-        .bundle_signer(signer.clone())
         .on_http(eth_rpc.parse().unwrap());
 
     let block_number = provider.get_block_number().await.unwrap();
@@ -40,7 +38,7 @@ async fn test_sim_bundle() {
     };
 
     let x = provider
-        .sim_bundle(bundle, SimBundleOverrides::default())
+        .sim_mev_bundle(bundle, SimBundleOverrides::default())
         .await;
 
     println!("{x:?}");

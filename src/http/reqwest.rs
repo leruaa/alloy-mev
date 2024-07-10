@@ -10,45 +10,43 @@ use tower::Service;
 
 use crate::MevHttp;
 
+use super::BundleSigner;
+
 impl<S: Signer + Clone + Send + Sync + 'static> MevHttp<reqwest::Client, S> {
-    fn request_to_mev_share(&self, req: RequestPacket) -> TransportFut<'static> {
+    fn send_authenticated_request(
+        &self,
+        req: RequestPacket,
+        bundle_signer: BundleSigner<S>,
+    ) -> TransportFut<'static> {
         let this = self.clone();
 
         Box::pin(async move {
             let body = serde_json::to_vec(&req).map_err(TransportError::ser_err)?;
 
-            let signer = this
+            let signature = bundle_signer
                 .signer
-                .ok_or(TransportErrorKind::custom_str("Missing bundle signer"))?;
-
-            let signature = signer
                 .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
                 .await
                 .map_err(TransportErrorKind::custom)?;
 
-            let resp = this
-                .http
+            this.http
                 .client()
-                .post(this.mev_share_url)
+                .post(this.url)
                 .header(
-                    "X-Flashbots-Signature",
+                    &bundle_signer.header,
                     format!(
                         "{:?}:0x{}",
-                        signer.address(),
+                        bundle_signer.address(),
                         hex::encode(signature.as_bytes())
                     ),
                 )
                 .body(body)
                 .send()
                 .await
-                .map_err(TransportErrorKind::custom)?;
-
-            let json = resp.text().await.map_err(TransportErrorKind::custom)?;
-
-            let resp =
-                serde_json::from_str(&json).map_err(|err| TransportError::deser_err(err, ""))?;
-
-            Ok(resp)
+                .map_err(TransportErrorKind::custom)?
+                .json()
+                .await
+                .map_err(TransportErrorKind::custom)
         })
     }
 }
@@ -69,10 +67,18 @@ where
     #[inline]
     fn call(&mut self, req: RequestPacket) -> Self::Future {
         match req {
-            RequestPacket::Single(single) => match single.method() {
-                m if m.starts_with("mev_") => self.request_to_mev_share(single.into()),
-                _ => self.http.call(single.into()),
-            },
+            RequestPacket::Single(single) => {
+                if let Some(bundle_signer) = self.bundle_signer.clone() {
+                    match single.method() {
+                        m if m.starts_with("mev_") => {
+                            self.send_authenticated_request(single.into(), bundle_signer)
+                        }
+                        _ => self.http.call(single.into()),
+                    }
+                } else {
+                    self.http.call(single.into())
+                }
+            }
             other => self.http.call(other),
         }
     }

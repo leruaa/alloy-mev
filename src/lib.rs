@@ -12,14 +12,6 @@
 mod http;
 pub use http::MevHttp;
 
-mod layer;
-pub use layer::MevLayer;
-
-mod mev_capable_provider_builder;
-pub use mev_capable_provider_builder::MevCapableProviderBuilder;
-
-mod mev_capable_provider_builder_ext;
-pub use mev_capable_provider_builder_ext::MevCapableProviderBuilderExt;
 
 mod mev_share_provider_ext;
 pub use mev_share_provider_ext::MevShareProviderExt;
