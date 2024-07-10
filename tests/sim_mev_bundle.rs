@@ -13,7 +13,7 @@ use alloy_rpc_types::TransactionRequest;
 use dotenv::dotenv;
 
 #[tokio::test]
-async fn test_sim_bundle() {
+async fn test_sim_mev_bundle() {
     dotenv().ok();
     let eth_rpc = env::var("ETH_HTTP_RPC").unwrap();
     let signer = PrivateKeySigner::random();
