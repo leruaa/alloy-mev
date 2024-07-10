@@ -30,6 +30,8 @@ alloy = { version = "0.1.4", features = [
 alloy-rpc-types = { version = "0.1.4", features = ["eth", "mev"] }
 hyper = { version = "1.1", features = ["client"], optional = true }
 tower = "0.4"
+futures = "0.3"
+pin-project = "1.1.5"
 reqwest = { version = "0.12", optional = true }
 url = "2.5"
 serde_json = "1.0"

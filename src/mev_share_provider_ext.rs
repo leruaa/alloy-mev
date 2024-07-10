@@ -5,7 +5,7 @@ use alloy::{
         Provider,
     },
     rpc::client::RpcCall,
-    signers::{k256::ecdsa::SigningKey, local::LocalSigner, Signer},
+    signers::Signer,
     transports::{http::Http, TransportErrorKind, TransportResult},
 };
 use alloy_rpc_types::mev::{
@@ -103,7 +103,7 @@ where
 
         RpcCall::new(
             request,
-            MevHttp::<_, LocalSigner<SigningKey>>::new(
+            MevHttp::new(
                 "https://relay.flashbots.net".parse().unwrap(),
                 self.client().transport().clone(),
                 None,

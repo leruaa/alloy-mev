@@ -1,7 +1,6 @@
 use std::task::{Context, Poll};
 
 use alloy::rpc::json_rpc::{RequestPacket, ResponsePacket};
-use alloy::signers::Signer;
 use alloy::{
     primitives::{hex, keccak256},
     transports::{TransportError, TransportErrorKind, TransportFut},
@@ -12,11 +11,11 @@ use crate::MevHttp;
 
 use super::BundleSigner;
 
-impl<S: Signer + Clone + Send + Sync + 'static> MevHttp<reqwest::Client, S> {
+impl MevHttp<reqwest::Client> {
     fn send_authenticated_request(
         &self,
         req: RequestPacket,
-        bundle_signer: BundleSigner<S>,
+        bundle_signer: BundleSigner,
     ) -> TransportFut<'static> {
         let this = self.clone();
 
@@ -51,10 +50,7 @@ impl<S: Signer + Clone + Send + Sync + 'static> MevHttp<reqwest::Client, S> {
     }
 }
 
-impl<S> Service<RequestPacket> for MevHttp<reqwest::Client, S>
-where
-    S: Signer + Clone + Send + Sync + 'static,
-{
+impl Service<RequestPacket> for MevHttp<reqwest::Client> {
     type Response = ResponsePacket;
     type Error = TransportError;
     type Future = TransportFut<'static>;
