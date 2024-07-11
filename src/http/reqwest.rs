@@ -16,25 +16,24 @@ impl MevHttp<reqwest::Client> {
         Box::pin(async move {
             let body = serde_json::to_vec(&req).map_err(TransportError::ser_err)?;
 
-            let mut builder = this.http.client().post(this.url);
-            if let Some(bundle_signer) = this.bundle_signer {
-                let signature = bundle_signer
-                    .signer
-                    .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
-                    .await
-                    .map_err(TransportErrorKind::custom)?;
+            let signature = this
+                .bundle_signer
+                .signer
+                .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
+                .await
+                .map_err(TransportErrorKind::custom)?;
 
-                builder = builder.header(
-                    &bundle_signer.header,
+            this.http
+                .client()
+                .post(this.url)
+                .header(
+                    &this.bundle_signer.header,
                     format!(
                         "{:?}:0x{}",
-                        bundle_signer.address(),
+                        this.bundle_signer.address(),
                         hex::encode(signature.as_bytes())
                     ),
-                );
-            }
-
-            builder
+                )
                 .body(body)
                 .send()
                 .await

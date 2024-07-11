@@ -20,8 +20,8 @@ impl Endpoints {
         EndpointsBuilder::new(http)
     }
 
-    /// Adds the given transport.
-    pub fn add(&mut self, transport: BoxTransport) {
+    /// Pushes the given transport.
+    pub fn push(&mut self, transport: BoxTransport) {
         self.0.push(transport)
     }
 
@@ -53,10 +53,19 @@ where
     C: Clone,
     MevHttp<C>: Transport,
 {
-    /// Adds a new transport to the [`Endpoints`] beiing built.
-    pub fn add(mut self, url: Url, bundle_signer: Option<BundleSigner>) -> Self {
+    /// Pushes a new transport to the [`Endpoints`] being built, with the given
+    /// signer used to build the header signature.
+    pub fn push_with_bundle_signer(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
         self.endpoints
-            .add(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
+            .push(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
+
+        self
+    }
+
+    /// Pushes a new transport to the [`Endpoints`] being built.
+    pub fn push(mut self, url: Url) -> Self {
+        self.endpoints
+            .push(Http::with_client(reqwest::Client::new(), url).boxed());
 
         self
     }

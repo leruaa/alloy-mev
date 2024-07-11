@@ -12,18 +12,18 @@ pub use endpoints::{Endpoints, EndpointsBuilder};
 #[cfg(feature = "reqwest")]
 mod reqwest;
 
-/// An Alloy `Transport` that handle `mev_sendBundle` and `mev_simBundle`
-/// requests and delegates all others to the inner `Transport`.
+/// An Alloy `Transport` that add a signature in the headers for `mev_*` and
+/// `eth_*` requests and delegates all others to the inner [`Transport`].
 #[derive(Debug, Clone)]
 pub struct MevHttp<T> {
     url: Url,
     http: Http<T>,
-    bundle_signer: Option<BundleSigner>,
+    bundle_signer: BundleSigner,
 }
 
 impl<T> MevHttp<T> {
     /// Creates a new [`MevHttp`] transport.
-    pub const fn new(url: Url, http: Http<T>, bundle_signer: Option<BundleSigner>) -> Self {
+    pub const fn new(url: Url, http: Http<T>, bundle_signer: BundleSigner) -> Self {
         Self {
             url,
             http,
@@ -39,7 +39,7 @@ impl<T> MevHttp<T> {
         Self {
             url: "https://relay.flashbots.net".parse().unwrap(),
             http,
-            bundle_signer: Some(BundleSigner::flashbots(Box::new(signer))),
+            bundle_signer: BundleSigner::flashbots(Box::new(signer)),
         }
     }
 }
@@ -49,7 +49,7 @@ impl<T> MevHttp<T> {
 pub struct BundleSigner {
     /// The header name on which set the signature.
     pub header: String,
-    /// THe signer use ti sign the bundle.
+    /// The signer used to sign the bundle.
     pub signer: Arc<dyn Signer + Send + Sync>,
 }
 

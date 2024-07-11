@@ -5,29 +5,25 @@ use alloy::{
         client::RpcCall,
         json_rpc::{Request, RpcObject},
     },
-    transports::{BoxFuture, Transport, TransportResult},
+    transports::{BoxFuture, TransportResult},
 };
 use futures::{future::join_all, Future, FutureExt};
 use pin_project::pin_project;
-
-use crate::MevHttp;
 
 use super::Endpoints;
 
 /// Allows to broadcast a request to many RPC endpoints.
 #[pin_project]
-pub struct BroadcastableCall<C, Params, Resp> {
+pub struct BroadcastableCall<Params, Resp> {
     #[pin]
     fut: BoxFuture<'static, Vec<TransportResult<Resp>>>,
-    phantom: PhantomData<(C, Params)>,
+    phantom: PhantomData<Params>,
 }
 
-impl<C, Params, Resp> BroadcastableCall<C, Params, Resp>
+impl<Params, Resp> BroadcastableCall<Params, Resp>
 where
-    C: Clone + Send + Sync + 'static,
     Params: RpcObject,
     Resp: RpcObject,
-    MevHttp<C>: Transport + Clone,
 {
     /// Creates a new [`BroadcastableCall`].
     pub fn new(endpoints: &Endpoints, request: Request<Params>) -> Self {
@@ -38,18 +34,12 @@ where
 
         Self {
             fut: join_all(calls).boxed(),
-            phantom: PhantomData::<(C, Params)>,
+            phantom: PhantomData::<Params>,
         }
     }
 }
 
-impl<C, Params, Resp> Future for BroadcastableCall<C, Params, Resp>
-where
-    C: Clone + Send + Sync + 'static,
-    Params: RpcObject,
-    Resp: RpcObject,
-    MevHttp<C>: Transport + Clone,
-{
+impl<Params, Resp> Future for BroadcastableCall<Params, Resp> {
     type Output = Vec<TransportResult<Resp>>;
 
     fn poll(
@@ -60,7 +50,7 @@ where
     }
 }
 
-impl<C, Params, Resp> Debug for BroadcastableCall<C, Params, Resp> {
+impl<Params, Resp> Debug for BroadcastableCall<Params, Resp> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("BroadcastableCall").finish()
     }
