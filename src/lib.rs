@@ -12,8 +12,8 @@
 mod http;
 pub use http::{BroadcastableCall, BundleSigner, Endpoints, EndpointsBuilder, MevHttp};
 
-mod eth_provider_ext;
-pub use eth_provider_ext::EthProviderExt;
+mod eth_mev_provider_ext;
+pub use eth_mev_provider_ext::EthMevProviderExt;
 
 mod mev_share_provider_ext;
 pub use mev_share_provider_ext::MevShareProviderExt;

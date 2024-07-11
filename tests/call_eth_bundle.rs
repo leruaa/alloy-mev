@@ -4,7 +4,7 @@ use alloy::hex;
 use alloy::network::EthereumWallet;
 use alloy::providers::ProviderBuilder;
 use alloy::signers::local::PrivateKeySigner;
-use alloy_mev::{BundleSigner, EthProviderExt};
+use alloy_mev::{BundleSigner, EthMevProviderExt};
 use alloy_rpc_types::mev::EthCallBundle;
 use alloy_rpc_types::BlockNumberOrTag;
 use dotenv::dotenv;

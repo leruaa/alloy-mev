@@ -18,7 +18,7 @@ use crate::http::{BroadcastableCall, Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
-pub trait EthProviderExt<C, N>
+pub trait EthMevProviderExt<C, N>
 where
     N: Network,
 {
@@ -56,7 +56,7 @@ where
 }
 
 #[async_trait]
-impl<F, P, N> EthProviderExt<reqwest::Client, N> for FillProvider<F, P, Http<reqwest::Client>, N>
+impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, Http<reqwest::Client>, N>
 where
     F: TxFiller<N>,
     P: Provider<Http<reqwest::Client>, N>,
