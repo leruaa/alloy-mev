@@ -39,21 +39,22 @@ impl<T> MevHttp<T> {
         Self {
             url: "https://relay.flashbots.net".parse().unwrap(),
             http,
-            bundle_signer: Some(BundleSigner::new(
-                "X-Flashbots-Signature".to_string(),
-                Box::new(signer),
-            )),
+            bundle_signer: Some(BundleSigner::flashbots(Box::new(signer))),
         }
     }
 }
 
+/// A [`Signer`] wrapper to sign bundles.
 #[derive(Clone)]
 pub struct BundleSigner {
+    /// The header name on which set the signature.
     pub header: String,
+    /// THe signer use ti sign the bundle.
     pub signer: Arc<dyn Signer + Send + Sync>,
 }
 
 impl BundleSigner {
+    /// Creates a new [`BundleSigner`]
     pub fn new<S>(header: String, signer: S) -> Self
     where
         S: Signer + Send + Sync + 'static,
@@ -64,6 +65,18 @@ impl BundleSigner {
         }
     }
 
+    /// Creates a [`BundleSigner`] set up to add the Flashbots header.
+    pub fn flashbots<S>(signer: S) -> Self
+    where
+        S: Signer + Send + Sync + 'static,
+    {
+        Self {
+            header: "X-Flashbots-Signature".to_string(),
+            signer: Arc::new(signer),
+        }
+    }
+
+    /// Returns the signer address.
     pub fn address(&self) -> Address {
         self.signer.address()
     }

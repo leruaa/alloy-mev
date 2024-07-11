@@ -30,7 +30,7 @@ where
     MevHttp<C>: Transport + Clone,
 {
     /// Creates a new [`BroadcastableCall`].
-    pub fn new(endpoints: &Endpoints<C>, request: Request<Params>) -> Self {
+    pub fn new(endpoints: &Endpoints, request: Request<Params>) -> Self {
         let calls = endpoints
             .iter()
             .map(|mev_http| RpcCall::new(request.clone(), mev_http.clone()))

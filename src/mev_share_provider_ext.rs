@@ -41,11 +41,14 @@ where
     /// Similar to `send_bundle` but instead of submitting a bundle to the
     /// matchmaker, it returns a simulation result. Only fully matched bundles
     /// can be simulated.
-    async fn sim_mev_bundle(
+    async fn sim_mev_bundle<S>(
         &self,
         bundle: SendBundleRequest,
         sim_overrides: SimBundleOverrides,
-    ) -> TransportResult<SimBundleResponse>;
+        signer: S,
+    ) -> TransportResult<SimBundleResponse>
+    where
+        S: Signer + Clone + Send + Sync + 'static;
 }
 
 #[async_trait]
@@ -92,22 +95,22 @@ where
         .await
     }
 
-    async fn sim_mev_bundle(
+    async fn sim_mev_bundle<S>(
         &self,
         bundle: SendBundleRequest,
         sim_overrides: SimBundleOverrides,
-    ) -> TransportResult<SimBundleResponse> {
+        signer: S,
+    ) -> TransportResult<SimBundleResponse>
+    where
+        S: Signer + Clone + Send + Sync + 'static,
+    {
         let request = self
             .client()
             .make_request("mev_simBundle", (bundle, sim_overrides));
 
         RpcCall::new(
             request,
-            MevHttp::new(
-                "https://relay.flashbots.net".parse().unwrap(),
-                self.client().transport().clone(),
-                None,
-            ),
+            MevHttp::flashbots(self.client().transport().clone(), signer),
         )
         .await
     }

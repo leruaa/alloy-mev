@@ -1,12 +1,12 @@
 use alloy::{
     eips::eip2718::Encodable2718,
     network::Network,
-    primitives::B256,
+    primitives::{Bytes, B256},
     providers::{
         fillers::{FillProvider, TxFiller},
         Provider,
     },
-    transports::{http::Http, TransportResult},
+    transports::{http::Http, TransportErrorKind, TransportResult},
 };
 use alloy_rpc_types::mev::{
     CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
@@ -22,12 +22,19 @@ pub trait EthProviderExt<C, N>
 where
     N: Network,
 {
+    /// Returns a [`EndpointsBuilder`] that can be used to build a new
+    /// [`Endpoints`].
+    fn endpoints_builder(&self) -> EndpointsBuilder<C>;
+
+    /// Sign and encode a transaction request.
+    async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes>;
+
     /// Submits a bundle to one or more builder(s). It takes in a bundle and
     /// provides a bundle hash as a return value.
     async fn send_eth_bundle(
         &self,
         bundle: EthSendBundle,
-        endpoints: &Endpoints<C>,
+        endpoints: &Endpoints,
     ) -> Vec<TransportResult<SendBundleResponse>>;
 
     /// Submits a single transaction to one or more builder(s). It takes in a
@@ -41,14 +48,11 @@ where
     async fn call_eth_bundle(
         &self,
         bundle: EthCallBundle,
-    ) -> TransportResult<EthCallBundleResponse>;
+        endpoints: &Endpoints,
+    ) -> Vec<TransportResult<EthCallBundleResponse>>;
 
     /// Cancels a previously submitted bundle.
     async fn cancel_eth_bundle(&self, request: CancelBundleRequest) -> TransportResult<()>;
-
-    /// Returns a [`EndpointsBuilder`] that can be used to build a new
-    /// [`Endpoints`].
-    fn endpoints_builder(&self) -> EndpointsBuilder<C>;
 }
 
 #[async_trait]
@@ -59,10 +63,24 @@ where
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
+    fn endpoints_builder(&self) -> EndpointsBuilder<reqwest::Client> {
+        EndpointsBuilder::new(self.client().transport().clone())
+    }
+
+    async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes> {
+        let sendable = self.fill(tx).await?;
+
+        if let Some(envelope) = sendable.as_envelope() {
+            Ok(envelope.encoded_2718().into())
+        } else {
+            Err(TransportErrorKind::custom_str("No signer has been setup"))
+        }
+    }
+
     async fn send_eth_bundle(
         &self,
         bundle: EthSendBundle,
-        endpoints: &Endpoints<reqwest::Client>,
+        endpoints: &Endpoints,
     ) -> Vec<TransportResult<SendBundleResponse>> {
         BroadcastableCall::new(
             endpoints,
@@ -83,15 +101,16 @@ where
     async fn call_eth_bundle(
         &self,
         bundle: EthCallBundle,
-    ) -> TransportResult<EthCallBundleResponse> {
-        self.client().request("eth_callBundle", (bundle,)).await
+        endpoints: &Endpoints,
+    ) -> Vec<TransportResult<EthCallBundleResponse>> {
+        BroadcastableCall::new(
+            endpoints,
+            self.client().make_request("eth_callBundle", (bundle,)),
+        )
+        .await
     }
 
     async fn cancel_eth_bundle(&self, request: CancelBundleRequest) -> TransportResult<()> {
         self.client().request("eth_cancelBundle", (request,)).await
-    }
-
-    fn endpoints_builder(&self) -> EndpointsBuilder<reqwest::Client> {
-        EndpointsBuilder::new(self.client().transport().clone())
     }
 }

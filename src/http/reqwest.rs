@@ -9,36 +9,32 @@ use tower::Service;
 
 use crate::MevHttp;
 
-use super::BundleSigner;
-
 impl MevHttp<reqwest::Client> {
-    fn send_authenticated_request(
-        &self,
-        req: RequestPacket,
-        bundle_signer: BundleSigner,
-    ) -> TransportFut<'static> {
+    fn send_request(&self, req: RequestPacket) -> TransportFut<'static> {
         let this = self.clone();
 
         Box::pin(async move {
             let body = serde_json::to_vec(&req).map_err(TransportError::ser_err)?;
 
-            let signature = bundle_signer
-                .signer
-                .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
-                .await
-                .map_err(TransportErrorKind::custom)?;
+            let mut builder = this.http.client().post(this.url);
+            if let Some(bundle_signer) = this.bundle_signer {
+                let signature = bundle_signer
+                    .signer
+                    .sign_message(format!("{:?}", keccak256(&body)).as_bytes())
+                    .await
+                    .map_err(TransportErrorKind::custom)?;
 
-            this.http
-                .client()
-                .post(this.url)
-                .header(
+                builder = builder.header(
                     &bundle_signer.header,
                     format!(
                         "{:?}:0x{}",
                         bundle_signer.address(),
                         hex::encode(signature.as_bytes())
                     ),
-                )
+                );
+            }
+
+            builder
                 .body(body)
                 .send()
                 .await
@@ -63,18 +59,12 @@ impl Service<RequestPacket> for MevHttp<reqwest::Client> {
     #[inline]
     fn call(&mut self, req: RequestPacket) -> Self::Future {
         match req {
-            RequestPacket::Single(single) => {
-                if let Some(bundle_signer) = self.bundle_signer.clone() {
-                    match single.method() {
-                        m if m.starts_with("mev_") => {
-                            self.send_authenticated_request(single.into(), bundle_signer)
-                        }
-                        _ => self.http.call(single.into()),
-                    }
-                } else {
-                    self.http.call(single.into())
+            RequestPacket::Single(single) => match single.method() {
+                m if m.starts_with("mev_") || m.starts_with("eth_") => {
+                    self.send_request(single.into())
                 }
-            }
+                _ => self.http.call(single.into()),
+            },
             other => self.http.call(other),
         }
     }
