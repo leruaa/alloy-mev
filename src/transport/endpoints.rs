@@ -3,9 +3,7 @@ use std::slice::Iter;
 use alloy::transports::{http::Http, BoxTransport, Transport};
 use url::Url;
 
-use crate::MevHttp;
-
-use super::BundleSigner;
+use crate::{BundleSigner, MevHttp};
 
 /// Stores a list of transports that can be used to broadcast a request to.
 #[derive(Debug)]

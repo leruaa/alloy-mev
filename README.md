@@ -62,7 +62,7 @@ async fn main() -> Result<()> {
 
 ### Blocks builders
 
-This crate also contains the `MevShareProviderExt` extension trait that adds
+This crate also contains the `EthMevProviderExt` extension trait that adds
 methods to broadcast bundles to blocks builders on yourprovider built on an
 HTTP transport.
 

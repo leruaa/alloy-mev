@@ -25,7 +25,7 @@ impl MevHttp<reqwest::Client> {
 
             this.http
                 .client()
-                .post(this.url)
+                .post(this.endpoint)
                 .header(
                     &this.bundle_signer.header,
                     format!(
