@@ -20,8 +20,8 @@ impl Endpoints {
         EndpointsBuilder::new(http)
     }
 
-    /// Pushes the given transport.
-    pub fn push(&mut self, transport: BoxTransport) {
+    /// Adds the given transport.
+    pub fn add(&mut self, transport: BoxTransport) {
         self.0.push(transport)
     }
 
@@ -53,19 +53,73 @@ where
     C: Clone,
     MevHttp<C>: Transport,
 {
-    /// Pushes a new transport to the [`Endpoints`] being built, with the given
+    /// Adds a new transport to the [`Endpoints`] being built, with the given
     /// signer used to build the header signature.
-    pub fn push_with_bundle_signer(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
+    pub fn endpoint_with_bundle_signer(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
         self.endpoints
-            .push(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
+            .add(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
 
         self
     }
 
-    /// Pushes a new transport to the [`Endpoints`] being built.
-    pub fn push(mut self, url: Url) -> Self {
+    /// Adds a new transport to the [`Endpoints`] being built.
+    pub fn endpoint(mut self, url: Url) -> Self {
         self.endpoints
-            .push(Http::with_client(reqwest::Client::new(), url).boxed());
+            .add(Http::with_client(reqwest::Client::new(), url).boxed());
+
+        self
+    }
+
+    /// Adds Beaverbuild.
+    pub fn beaverbuild(mut self) -> Self {
+        self.endpoints.add(
+            Http::with_client(
+                reqwest::Client::new(),
+                "https://rpc.beaverbuild.org".parse().unwrap(),
+            )
+            .boxed(),
+        );
+
+        self
+    }
+
+    /// Adds Titan.
+    pub fn titan(mut self, bundle_signer: BundleSigner) -> Self {
+        self.endpoints.add(
+            MevHttp::new(
+                "https://rpc.titanbuilder.xyz".parse().unwrap(),
+                self.base_transport.clone(),
+                bundle_signer,
+            )
+            .boxed(),
+        );
+
+        self
+    }
+
+    /// Adds Rsync.
+    pub fn rsync(mut self) -> Self {
+        self.endpoints.add(
+            Http::with_client(
+                reqwest::Client::new(),
+                "https://rsync-builder.xyz/".parse().unwrap(),
+            )
+            .boxed(),
+        );
+
+        self
+    }
+
+    /// Adds Flashbots.
+    pub fn flashbots(mut self, bundle_signer: BundleSigner) -> Self {
+        self.endpoints.add(
+            MevHttp::new(
+                "https://relay.flashbots.net".parse().unwrap(),
+                self.base_transport.clone(),
+                bundle_signer,
+            )
+            .boxed(),
+        );
 
         self
     }
