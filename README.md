@@ -9,25 +9,18 @@ Easily send transaction bundles using [Alloy].
 Add `alloy-mev` to your `Cargo.toml`.
 
 ```toml
-alloy-mev = "0.1"
+alloy-mev = "0.2"
 ```
 
-## Usage
+## Features
+
+### MEV-Share
+
+This crate contains the `MevShareProviderExt` extension trait. When it's
+in scope, it adds methods to send bundles to the Flashbots matchmaker on your
+provider built on an HTTP transport.
 
 ```rust
-use std::env;
-
-use alloy_mev::{
-    rpc::{Inclusion, SendBundleRequest},
-};
-use alloy_primitives::{address, U256};
-use alloy::network::{Ethereum, EthereumWallet};
-use alloy::providers::ProviderBuilder;
-use alloy::rpc::types::eth::TransactionRequest;
-use alloy::signers::local::LocalSigner;
-use anyhow::Result;
-use dotenv::dotenv;
-
 #[tokio::main]
 async fn main() -> Result<()> {
     dotenv().ok();
@@ -64,6 +57,59 @@ async fn main() -> Result<()> {
     println!("Bundle hash: {}", response.bundle_hash);
 
     Ok(())
+}
+```
+
+### Blocks builders
+
+This crate also contains the `MevShareProviderExt` extension trait that adds
+methods to broadcast bundles to blocks builders on yourprovider built on an
+HTTP transport.
+
+```rust
+#[tokio::main]
+async fn main() -> Result<()> {
+    dotenv().ok();
+    let eth_rpc = env::var("ETH_HTTP_RPC").unwrap();
+    let bundle_signer = PrivateKeySigner::random();
+    let tx_signer = EthereumWallet::new(signer.clone());
+
+    let provider = ProviderBuilder::new()
+        .with_recommended_fillers()
+        .wallet(tx_signer.clone())
+        .on_http(eth_rpc.parse().unwrap());
+
+    // Select which builders the bundle will be sent to
+    let endpoints = provider
+        .endpoints_builder()
+        .beaverbuild()
+        .titan(BundleSigner::flashbots(bundle_signer.clone()))
+        .build();
+
+    let block_number: u64 = provider.get_block_number().await.unwrap().into();
+
+    // Pay Vitalik using a MEV-Share bundle!
+    let tx = TransactionRequest::default()
+        .from(tx_signer.default_signer_address())
+        .to(Some(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045"))) // vitalik.eth
+        .value(U256::from(1000000000));
+
+    // Broadcast the bundle to all builders setup above!
+    let responses = provider
+        .send_eth_bundle(
+            EthSendBundle {
+                txs: vec![provider.encode_request(tx)],
+                block_number: block_number + 1,
+                min_timestamp: None,
+                max_timestamp: None,
+                reverting_tx_hashes: vec![],
+                replacement_uuid: None,
+            },
+            &endpoints,
+        )
+        .await;
+
+    println!("{responses:#?}");
 }
 ```
 
