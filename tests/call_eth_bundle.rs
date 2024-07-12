@@ -23,10 +23,7 @@ async fn test_call_eth_bundle() {
 
     let endpoints = provider
         .endpoints_builder()
-        .push_with_bundle_signer(
-            "https://relay.flashbots.net".parse().unwrap(),
-            BundleSigner::flashbots(signer.clone()),
-        )
+        .flashbots(BundleSigner::flashbots(signer.clone()))
         .build();
 
     let block_number = 20247245;
