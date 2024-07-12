@@ -14,7 +14,7 @@ use alloy_rpc_types::mev::{
 };
 use async_trait::async_trait;
 
-use crate::http::{BroadcastableCall, Endpoints, EndpointsBuilder};
+use crate::transport::{BroadcastableCall, Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
