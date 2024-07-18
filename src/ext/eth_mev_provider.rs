@@ -1,11 +1,11 @@
 use alloy::{
     network::Network,
     primitives::{Bytes, B256},
+    rpc::types::mev::{
+        CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
+        PrivateTransactionRequest, SendBundleResponse,
+    },
     transports::TransportResult,
-};
-use alloy_rpc_types::mev::{
-    CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
-    PrivateTransactionRequest, SendBundleResponse,
 };
 use async_trait::async_trait;
 

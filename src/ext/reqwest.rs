@@ -7,13 +7,13 @@ use alloy::{
         Provider,
     },
     rpc::client::RpcCall,
+    rpc::types::mev::{
+        BundleItem, CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
+        PrivateTransactionRequest, SendBundleRequest, SendBundleResponse, SimBundleOverrides,
+        SimBundleResponse,
+    },
     signers::Signer,
     transports::{http::Http, TransportErrorKind, TransportResult},
-};
-use alloy_rpc_types::mev::{
-    BundleItem, CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
-    PrivateTransactionRequest, SendBundleRequest, SendBundleResponse, SimBundleOverrides,
-    SimBundleResponse,
 };
 use async_trait::async_trait;
 

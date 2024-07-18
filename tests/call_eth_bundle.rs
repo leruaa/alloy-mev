@@ -1,12 +1,13 @@
 use std::env;
 
-use alloy::hex;
-use alloy::network::EthereumWallet;
-use alloy::providers::ProviderBuilder;
-use alloy::signers::local::PrivateKeySigner;
+use alloy::{
+    hex,
+    network::EthereumWallet,
+    providers::ProviderBuilder,
+    rpc::types::{mev::EthCallBundle, BlockNumberOrTag},
+    signers::local::PrivateKeySigner,
+};
 use alloy_mev::{BundleSigner, EthMevProviderExt};
-use alloy_rpc_types::mev::EthCallBundle;
-use alloy_rpc_types::BlockNumberOrTag;
 use dotenv::dotenv;
 
 #[tokio::test]

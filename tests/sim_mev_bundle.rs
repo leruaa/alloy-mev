@@ -1,14 +1,13 @@
 use std::env;
 
-use alloy::hex;
-use alloy::network::EthereumWallet;
-use alloy::providers::ProviderBuilder;
-use alloy::signers::local::PrivateKeySigner;
+use alloy::{
+    hex,
+    network::EthereumWallet,
+    providers::ProviderBuilder,
+    rpc::types::mev::{BundleItem, Inclusion, SendBundleRequest, SimBundleOverrides},
+    signers::local::PrivateKeySigner,
+};
 use alloy_mev::MevShareProviderExt;
-use alloy_rpc_types::mev::BundleItem;
-use alloy_rpc_types::mev::Inclusion;
-use alloy_rpc_types::mev::SendBundleRequest;
-use alloy_rpc_types::mev::SimBundleOverrides;
 use dotenv::dotenv;
 
 #[tokio::test]

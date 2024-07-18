@@ -1,6 +1,10 @@
-use alloy::{network::Network, signers::Signer, transports::TransportResult};
-use alloy_rpc_types::mev::{
-    BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
+use alloy::{
+    network::Network,
+    rpc::types::mev::{
+        BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
+    },
+    signers::Signer,
+    transports::TransportResult,
 };
 use async_trait::async_trait;
 
