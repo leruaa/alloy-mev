@@ -27,15 +27,15 @@ async fn main() -> Result<()> {
     let eth_rpc = env::var("ETH_HTTP_RPC")?;
 
     // This is your searcher identity
-    let bundle_signer = LocalSigner::random();
+    let bundle_signer = PrivateKeySigner::random();
 
     // This signs transactions
-    let tx_signer = EthereumWallet::from(LocalSigner::random());
+    let tx_signer = EthereumWallet::from(PrivateKeySigner::random());
 
     // Build a provider with MEV
     let provider = ProviderBuilder::new()
         .with_recommended_fillers()
-        .signer(tx_signer.clone())
+        .wallet(tx_signer.clone())
         .on_http(eth_rpc.parse()?);
 
     // Pay Vitalik using a MEV-Share bundle!
