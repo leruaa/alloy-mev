@@ -1,6 +1,6 @@
 [package]
 name = "alloy-mev"
-version = "0.2.1"
+version = "0.3.0"
 authors = ["leruaa"]
 license = "MIT"
 edition = "2021"
