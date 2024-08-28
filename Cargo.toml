@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 
 [dependencies]
-alloy = { version = "0.2.0", features = [
+alloy = { version = "0.3.0", features = [
     "rpc",
     "rpc-client",
     "rpc-types-mev",
