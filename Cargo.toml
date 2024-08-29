@@ -1,6 +1,6 @@
 [package]
 name = "alloy-mev"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["leruaa"]
 license = "MIT"
 edition = "2021"
@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest"]
 
 [dependencies]
-alloy = { version = "0.2.0", features = [
+alloy = { version = "0.3.0", features = [
     "rpc",
     "rpc-client",
     "rpc-types-mev",
@@ -40,7 +40,7 @@ async-trait = "0.1"
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt", "macros"] }
-alloy = { version = "0.2.0", features = [
+alloy = { version = "0.3.0", features = [
     "rpc-client",
     "consensus",
     "signer-local",
