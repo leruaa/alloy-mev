@@ -1,18 +1,23 @@
 use alloy::{
     network::Network,
+    providers::Provider,
     rpc::types::mev::{
         BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
     },
     signers::Signer,
-    transports::TransportResult,
+    transports::{http::Http, Transport, TransportResult},
 };
 use async_trait::async_trait;
 
+use crate::MevShareBundle;
+
 /// Extension trait for sending and simulate MEV-Share bundles.
 #[async_trait]
-pub trait MevShareProviderExt<N>
+pub trait MevShareProviderExt<C, N>: Provider<Http<C>, N> + Sized
 where
+    C: Clone,
     N: Network,
+    Http<C>: Transport,
 {
     /// Builds a bundle item from a transaction request.
     async fn build_bundle_item(
@@ -20,6 +25,11 @@ where
         tx: N::TransactionRequest,
         can_revert: bool,
     ) -> TransportResult<BundleItem>;
+
+    /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
+    fn build_bundle<'a, S>(&'a self, bundle_signer: S) -> MevShareBundle<'a, Self, C, N, S>
+    where
+        S: Signer + Send + Sync + 'static;
 
     /// Submits a bundle to the MEV-Share matchmaker. It takes in a bundle and
     /// provides a bundle hash as a return value.

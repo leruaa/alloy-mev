@@ -18,11 +18,13 @@ use alloy::{
 use async_trait::async_trait;
 
 use crate::{
-    BroadcastableCall, Endpoints, EndpointsBuilder, EthMevProviderExt, MevHttp, MevShareProviderExt,
+    BroadcastableCall, Endpoints, EndpointsBuilder, EthMevProviderExt, MevHttp, MevShareBundle,
+    MevShareProviderExt,
 };
 
 #[async_trait]
-impl<F, P, N> MevShareProviderExt<N> for FillProvider<F, P, Http<reqwest::Client>, N>
+impl<F, P, N> MevShareProviderExt<reqwest::Client, N>
+    for FillProvider<F, P, Http<reqwest::Client>, N>
 where
     F: TxFiller<N>,
     P: Provider<Http<reqwest::Client>, N>,
@@ -46,6 +48,16 @@ where
         } else {
             Err(TransportErrorKind::custom_str("No signer has been setup"))
         }
+    }
+
+    fn build_bundle<'a, S>(
+        &'a self,
+        bundle_signer: S,
+    ) -> MevShareBundle<'a, Self, reqwest::Client, N, S>
+    where
+        S: Signer + Send + Sync + 'static,
+    {
+        MevShareBundle::new(self, bundle_signer)
     }
 
     async fn send_mev_bundle<S>(
