@@ -1,21 +1,27 @@
 use alloy::{
     network::Network,
     primitives::{Bytes, B256},
+    providers::Provider,
     rpc::types::mev::{
         CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
         PrivateTransactionRequest, SendBundleResponse,
     },
-    transports::TransportResult,
+    transports::{http::Http, Transport, TransportResult},
 };
 use async_trait::async_trait;
 
-use crate::transport::{Endpoints, EndpointsBuilder};
+use crate::{
+    transport::{Endpoints, EndpointsBuilder},
+    EthBundle,
+};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
-pub trait EthMevProviderExt<C, N>
+pub trait EthMevProviderExt<C, N>: Provider<Http<C>, N> + Sized
 where
+    C: Clone,
     N: Network,
+    Http<C>: Transport,
 {
     /// Returns a [`EndpointsBuilder`] that can be used to build a new
     /// [`Endpoints`].
@@ -23,6 +29,9 @@ where
 
     /// Sign and encode a transaction request.
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes>;
+
+    /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
+    fn build_bundle<'a>(&'a self) -> EthBundle<'a, Self, Http<C>, N>;
 
     /// Submits a bundle to one or more builder(s). It takes in a bundle and
     /// provides a bundle hash as a return value.

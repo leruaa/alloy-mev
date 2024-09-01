@@ -18,8 +18,8 @@ use alloy::{
 use async_trait::async_trait;
 
 use crate::{
-    BroadcastableCall, Endpoints, EndpointsBuilder, EthMevProviderExt, MevHttp, MevShareBundle,
-    MevShareProviderExt,
+    BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt, MevHttp,
+    MevShareBundle, MevShareProviderExt,
 };
 
 #[async_trait]
@@ -118,6 +118,10 @@ where
         } else {
             Err(TransportErrorKind::custom_str("No signer has been setup"))
         }
+    }
+
+    fn build_bundle<'a>(&'a self) -> EthBundle<'a, Self, Http<reqwest::Client>, N> {
+        EthBundle::new(self)
     }
 
     async fn send_eth_bundle(
