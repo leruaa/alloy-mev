@@ -81,10 +81,42 @@ where
         self.endpoint("https://rpc.beaverbuild.org".parse().unwrap())
     }
 
-    /// Adds Titan.
+    /// Adds Titan using AWS geo-routing to find the best RPC to send to.
+    /// Instead, the following methods that uses geo-located RPC can be used:
+    /// * [`titan_europe`]
+    /// * [`titan_united_states`]
+    /// * [`titan_asia`]
+    ///
+    /// [`titan_europe`]: EndpointsBuilder::titan_europe
+    /// [`titan_united_states`]: EndpointsBuilder::titan_united_states
+    /// [`titan_asia`]: EndpointsBuilder::titan_asia
     pub fn titan(self, bundle_signer: BundleSigner) -> Self {
         self.authenticated_endpoint(
             "https://rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the Europe RPC.
+    pub fn titan_europe(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://eu.rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the United States RPC.
+    pub fn titan_united_states(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://us.rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the Asia RPC.
+    pub fn titan_asia(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://as.rpc.titanbuilder.xyz".parse().unwrap(),
             bundle_signer,
         )
     }
