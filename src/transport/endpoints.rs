@@ -68,58 +68,38 @@ where
         self
     }
 
-    /// Adds Beaverbuild.
-    pub fn beaverbuild(mut self) -> Self {
-        self.endpoints.add(
-            Http::with_client(
-                reqwest::Client::new(),
-                "https://rpc.beaverbuild.org".parse().unwrap(),
-            )
-            .boxed(),
-        );
+    /// Adds a new transport to the [`Endpoints`] being built, using the given signer for header authentication.
+    pub fn authenticated_endpoint(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
+        self.endpoints
+            .add(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
 
         self
+    }
+
+    /// Adds Beaverbuild.
+    pub fn beaverbuild(self) -> Self {
+        self.endpoint("https://rpc.beaverbuild.org".parse().unwrap())
     }
 
     /// Adds Titan.
-    pub fn titan(mut self, bundle_signer: BundleSigner) -> Self {
-        self.endpoints.add(
-            MevHttp::new(
-                "https://rpc.titanbuilder.xyz".parse().unwrap(),
-                self.base_transport.clone(),
-                bundle_signer,
-            )
-            .boxed(),
-        );
-
-        self
+    pub fn titan(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
     }
 
     /// Adds Rsync.
-    pub fn rsync(mut self) -> Self {
-        self.endpoints.add(
-            Http::with_client(
-                reqwest::Client::new(),
-                "https://rsync-builder.xyz/".parse().unwrap(),
-            )
-            .boxed(),
-        );
-
-        self
+    pub fn rsync(self) -> Self {
+        self.endpoint("https://rsync-builder.xyz".parse().unwrap())
     }
 
     /// Adds Flashbots.
-    pub fn flashbots(mut self, bundle_signer: BundleSigner) -> Self {
-        self.endpoints.add(
-            MevHttp::new(
-                "https://relay.flashbots.net".parse().unwrap(),
-                self.base_transport.clone(),
-                bundle_signer,
-            )
-            .boxed(),
-        );
-
-        self
+    pub fn flashbots(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://relay.flashbots.net".parse().unwrap(),
+            bundle_signer,
+        )
     }
 
     /// Returns the [`Endpoints`] struct.
