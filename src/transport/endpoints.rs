@@ -49,6 +49,7 @@ impl<C> EndpointsBuilder<C> {
 impl<C> EndpointsBuilder<C>
 where
     C: Clone,
+    Http<C>: Transport,
     MevHttp<C>: Transport,
 {
     /// Adds a new transport to the [`Endpoints`] being built, with the given
@@ -63,7 +64,7 @@ where
     /// Adds a new transport to the [`Endpoints`] being built.
     pub fn endpoint(mut self, url: Url) -> Self {
         self.endpoints
-            .add(Http::with_client(reqwest::Client::new(), url).boxed());
+            .add(Http::with_client(self.base_transport.client().clone(), url).boxed());
 
         self
     }
