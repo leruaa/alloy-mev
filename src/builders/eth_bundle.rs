@@ -1,14 +1,18 @@
 use std::marker::PhantomData;
 
 use alloy::{
-    network::Network,
+    network::{Ethereum, Network},
     primitives::{Bytes, B256},
     providers::Provider,
     rpc::types::mev::{EthSendBundle, SendBundleResponse},
-    transports::{Transport, TransportResult},
+    transports::{http::Http, Transport, TransportResult},
 };
 
 use crate::{BroadcastableCall, Endpoints};
+
+#[cfg(feature = "reqwest")]
+/// A [`EthBundle`] on Ethereun network using Reqwest HTTP transport.
+pub type EthereumReqwestEthBundle<'a, P> = EthBundle<'a, P, Http<reqwest::Client>, Ethereum>;
 
 /// A bundle that can be sent to one or more builder(s).
 #[derive(Debug)]

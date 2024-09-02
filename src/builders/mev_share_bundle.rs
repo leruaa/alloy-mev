@@ -17,6 +17,7 @@ use alloy::{
 
 use crate::MevHttp;
 
+#[cfg(feature = "reqwest")]
 /// A [`MevShareBundle`] on Ethereun network using Reqwest HTTP transport.
 pub type EthereumReqwestMevShareBundle<'a, P, S> =
     MevShareBundle<'a, P, Http<reqwest::Client>, Ethereum, S>;

@@ -10,7 +10,9 @@
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 
 mod builders;
-pub use builders::{EthBundle, EthereumReqwestMevShareBundle, MevShareBundle};
+pub use builders::{
+    EthBundle, EthereumReqwestEthBundle, EthereumReqwestMevShareBundle, MevShareBundle,
+};
 
 mod ext;
 pub use ext::{EthMevProviderExt, MevShareProviderExt};
