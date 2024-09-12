@@ -10,10 +10,9 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-use crate::{
-    transport::{Endpoints, EndpointsBuilder},
-    EthBundle,
-};
+use crate::EthBundle;
+
+use super::{Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
