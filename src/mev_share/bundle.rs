@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
 use alloy::{
-    network::{Ethereum, Network},
+    network::Network,
     primitives::B256,
     providers::Provider,
     rpc::{
@@ -16,11 +16,6 @@ use alloy::{
 };
 
 use crate::MevHttp;
-
-#[cfg(feature = "reqwest")]
-/// A [`MevShareBundle`] on Ethereun network using Reqwest HTTP transport.
-pub type EthereumReqwestMevShareBundle<'a, P, S> =
-    MevShareBundle<'a, P, Http<reqwest::Client>, Ethereum, S>;
 
 /// A MEV-Share bundle hat can be sent or simulated.
 #[derive(Debug)]

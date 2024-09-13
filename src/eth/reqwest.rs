@@ -1,6 +1,6 @@
 use alloy::{
     eips::eip2718::Encodable2718,
-    network::Network,
+    network::{Ethereum, Network},
     primitives::{Bytes, B256},
     providers::{
         fillers::{FillProvider, TxFiller},
@@ -8,16 +8,16 @@ use alloy::{
     },
     rpc::types::mev::{
         CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
-        PrivateTransactionRequest, SendBundleResponse, 
+        PrivateTransactionRequest, SendBundleResponse,
     },
-
     transports::{http::Http, TransportErrorKind, TransportResult},
 };
 use async_trait::async_trait;
 
-use crate::{
-    BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt
-};
+use crate::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt};
+
+/// A [`EthBundle`] on Ethereun network using Reqwest HTTP transport.
+pub type EthereumReqwestEthBundle<'a, P> = EthBundle<'a, P, Http<reqwest::Client>, Ethereum>;
 
 #[async_trait]
 impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, Http<reqwest::Client>, N>

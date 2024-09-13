@@ -2,7 +2,7 @@ mod broadcastable_call;
 pub use broadcastable_call::BroadcastableCall;
 
 mod bundle;
-pub use bundle::{EthBundle, EthereumReqwestEthBundle};
+pub use bundle::EthBundle;
 
 mod endpoints;
 pub use endpoints::{Endpoints, EndpointsBuilder};
@@ -12,3 +12,5 @@ pub use provider_ext::EthMevProviderExt;
 
 #[cfg(feature = "reqwest")]
 mod reqwest;
+#[cfg(feature = "reqwest")]
+pub use reqwest::EthereumReqwestEthBundle;

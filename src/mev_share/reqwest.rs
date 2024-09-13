@@ -1,13 +1,16 @@
 use alloy::{
     eips::eip2718::Encodable2718,
-    network::Network,
+    network::{Ethereum, Network},
     providers::{
         fillers::{FillProvider, TxFiller},
         Provider,
     },
-    rpc::client::RpcCall,
-    rpc::types::mev::{
-        BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
+    rpc::{
+        client::RpcCall,
+        types::mev::{
+            BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides,
+            SimBundleResponse,
+        },
     },
     signers::Signer,
     transports::{http::Http, TransportErrorKind, TransportResult},
@@ -15,6 +18,10 @@ use alloy::{
 use async_trait::async_trait;
 
 use crate::{MevHttp, MevShareBundle, MevShareProviderExt};
+
+/// A [`MevShareBundle`] on Ethereun network using Reqwest HTTP transport.
+pub type EthereumReqwestMevShareBundle<'a, P, S> =
+    MevShareBundle<'a, P, Http<reqwest::Client>, Ethereum, S>;
 
 #[async_trait]
 impl<F, P, N> MevShareProviderExt<reqwest::Client, N>
