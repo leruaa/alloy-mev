@@ -1,8 +1,14 @@
 # Alloy MEV
 
-Easily send transaction bundles using [Alloy].
+Easily send transaction bundles to MEV-Share or block builders using [Alloy].
+
+You can have a look at [the docs] to help you get started. There are also
+some [examples] available. 
+
 
 [Alloy]: https://github.com/alloy-rs/alloy
+[the docs]: https://docs.rs/alloy-mev/latest/alloy_mev/
+[examples]: https://github.com/leruaa/alloy-mev/tree/main/examples
 
 ## Installation
 
