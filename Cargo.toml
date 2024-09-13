@@ -39,9 +39,13 @@ async-trait = "0.1"
 
 [dev-dependencies]
 dotenv = "0.15"
-tokio = { version = "1", features = ["rt", "macros"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+anyhow = "1.0"
 alloy = { version = "0.3.0", features = [
     "rpc-client",
     "consensus",
     "signer-local",
 ] }
+
+[package.metadata.docs.rs]
+cargo-args = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]
