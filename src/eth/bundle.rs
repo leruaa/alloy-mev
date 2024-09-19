@@ -29,7 +29,7 @@ where
     T: Transport + Clone,
     N: Network,
 {
-    ///
+    /// Creates a new [`EthBundle`]
     pub fn new(provider: &'a P) -> Self {
         Self {
             provider,
@@ -53,21 +53,21 @@ where
     }
 
     /// Sets the block number for which this bundle is valid.
-    pub fn on_block(mut self, block: u64) -> Self {
+    pub const fn on_block(mut self, block: u64) -> Self {
         self.bundle.block_number = block;
 
         self
     }
 
     /// Sets the unix timestamp when this bundle becomes active.
-    pub fn with_min_timestamp(mut self, min_timestamp: u64) -> Self {
+    pub const fn with_min_timestamp(mut self, min_timestamp: u64) -> Self {
         self.bundle.min_timestamp = Some(min_timestamp);
 
         self
     }
 
     /// Sets the unix timestamp how long this bundle stays valid.
-    pub fn with_max_timestamp(mut self, max_timestamp: u64) -> Self {
+    pub const fn with_max_timestamp(mut self, max_timestamp: u64) -> Self {
         self.bundle.max_timestamp = Some(max_timestamp);
 
         self

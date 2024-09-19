@@ -72,7 +72,7 @@ where
     }
 
     /// Adds the data used by block builders to check if the bundle should be considered for inclusion.
-    pub fn with_inclusion(mut self, block: u64, max_block: Option<u64>) -> Self {
+    pub const fn with_inclusion(mut self, block: u64, max_block: Option<u64>) -> Self {
         self.bundle.inclusion.block = block;
         self.bundle.inclusion.max_block = max_block;
 
