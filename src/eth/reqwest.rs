@@ -41,7 +41,7 @@ where
         }
     }
 
-    fn build_bundle<'a>(&'a self) -> EthBundle<'a, Self, Http<reqwest::Client>, N> {
+    fn build_bundle(&self) -> EthBundle<'_, Self, Http<reqwest::Client>, N> {
         EthBundle::new(self)
     }
 

@@ -30,7 +30,7 @@ async fn main() -> Result<()> {
         .titan(BundleSigner::flashbots(bundle_signer.clone()))
         .build();
 
-    let block_number: u64 = provider.get_block_number().await?.into();
+    let block_number: u64 = provider.get_block_number().await?;
 
     // Pay Vitalik using a MEV-Share bundle!
     let tx = TransactionRequest::default()

@@ -30,7 +30,7 @@ where
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes>;
 
     /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
-    fn build_bundle<'a>(&'a self) -> EthBundle<'a, Self, Http<C>, N>;
+    fn build_bundle(&self) -> EthBundle<'_, Self, Http<C>, N>;
 
     /// Submits a bundle to one or more builder(s). It takes in a bundle and
     /// provides a bundle hash as a return value.

@@ -51,10 +51,7 @@ where
         }
     }
 
-    fn build_bundle<'a, S>(
-        &'a self,
-        bundle_signer: S,
-    ) -> MevShareBundle<'a, Self, reqwest::Client, N, S>
+    fn build_bundle<S>(&self, bundle_signer: S) -> MevShareBundle<'_, Self, reqwest::Client, N, S>
     where
         S: Signer + Send + Sync + 'static,
     {

@@ -27,7 +27,7 @@ where
     ) -> TransportResult<BundleItem>;
 
     /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
-    fn build_bundle<'a, S>(&'a self, bundle_signer: S) -> MevShareBundle<'a, Self, C, N, S>
+    fn build_bundle<S>(&self, bundle_signer: S) -> MevShareBundle<'_, Self, C, N, S>
     where
         S: Signer + Send + Sync + 'static;
 
