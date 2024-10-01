@@ -6,17 +6,37 @@ on:
   pull_request:
 
 env:
-  CARGO_TERM_COLOR: 
+  CARGO_TERM_COLOR: always
   ETH_HTTP_RPC: ${{ secrets.ETH_HTTP_RPC }}
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
+  test:
+    name: Test ${{ matrix.rust }} ${{ matrix.flags }}
+    timeout-minutes: 30
+    runs-on: "ubuntu-latest"
+    strategy:
+      fail-fast: false
+      matrix:
+        rust:
+          - "stable"
+          - "nightly"
+        flags:
+          # No features
+          - "--no-default-features"
+          # Default features
+          - ""
+          # All features
+          - "--all-features"
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
-      run: cargo build --verbose
-    - name: Run tests
-      run: cargo test --verbose
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.rust }}
+      - name: Install cargo-nextest
+        uses: taiki-e/install-action@nextest
+      - name: Build
+        run: cargo build --workspace ${{ matrix.flags }}
+      - name: Test
+        run: cargo nextest run --workspace ${{ matrix.flags }}
