@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest", "dep:serde_json", "dep:tower"]
 
 [dependencies]
-alloy = { version = "0.3", features = [
+alloy = { version = "0.4", features = [
     "rpc",
     "rpc-client",
     "rpc-types-mev",
@@ -34,14 +34,14 @@ futures = "0.3"
 pin-project = "1.1"
 reqwest = { version = "0.12", optional = true }
 url = "2.5"
-serde_json = { version ="1.0", optional = true }
+serde_json = { version = "1.0", optional = true }
 async-trait = "0.1"
 
 [dev-dependencies]
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 anyhow = "1.0"
-alloy = { version = "0.3", features = [
+alloy = { version = "0.4", features = [
     "rpc-client",
     "consensus",
     "signer-local",
