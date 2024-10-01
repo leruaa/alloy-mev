@@ -10,6 +10,7 @@ use alloy::{
 use alloy_mev::MevShareProviderExt;
 use dotenv::dotenv;
 
+#[cfg(feature = "reqwest")]
 #[tokio::test]
 async fn test_sim_mev_bundle() {
     dotenv().ok();
