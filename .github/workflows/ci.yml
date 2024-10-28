@@ -7,7 +7,7 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  ETH_HTTP_RPC: ${{ secrets.ETH_HTTP_RPC }}
+  ETH_HTTP_RPC: https://eth.llamarpc.com
 
 jobs:
   test:
