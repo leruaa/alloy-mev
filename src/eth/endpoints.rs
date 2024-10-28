@@ -52,15 +52,6 @@ where
     Http<C>: Transport,
     MevHttp<C>: Transport,
 {
-    /// Adds a new transport to the [`Endpoints`] being built, with the given
-    /// signer used to build the header signature.
-    pub fn endpoint_with_bundle_signer(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
-        self.endpoints
-            .add(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
-
-        self
-    }
-
     /// Adds a new transport to the [`Endpoints`] being built.
     pub fn endpoint(mut self, url: Url) -> Self {
         self.endpoints
