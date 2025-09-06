@@ -17,7 +17,7 @@ default = ["reqwest"]
 reqwest = ["dep:reqwest", "dep:serde_json", "dep:tower"]
 
 [dependencies]
-alloy = { version = "0.5", features = [
+alloy = { version = "1.0.30", features = [
     "rpc",
     "rpc-client",
     "rpc-types-mev",
@@ -41,7 +41,7 @@ async-trait = "0.1"
 dotenv = "0.15"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 anyhow = "1.0"
-alloy = { version = "0.5", features = [
+alloy = { version = "1.0.30", features = [
     "rpc-client",
     "consensus",
     "signer-local",

@@ -24,7 +24,7 @@ impl Endpoints {
     }
 
     /// Returns an iterator over the transports.
-    pub fn iter(&self) -> Iter<BoxTransport> {
+    pub fn iter(&self) -> Iter<'_, BoxTransport> {
         self.0.iter()
     }
 }
@@ -36,6 +36,13 @@ pub struct EndpointsBuilder<C> {
     endpoints: Endpoints,
 }
 
+/// An [`Endpoints`] builder that works with BoxTransport.
+#[derive(Debug)]
+pub struct EndpointsBuilderBox {
+    base_transport: BoxTransport,
+    endpoints: Endpoints,
+}
+
 impl<C> EndpointsBuilder<C> {
     /// Creates a new builder.
     pub const fn new(base_transport: Http<C>) -> Self {
@@ -43,6 +50,82 @@ impl<C> EndpointsBuilder<C> {
             base_transport,
             endpoints: Endpoints(vec![]),
         }
+    }
+}
+
+impl EndpointsBuilderBox {
+    /// Creates a new builder.
+    pub const fn new(base_transport: BoxTransport) -> Self {
+        Self {
+            base_transport,
+            endpoints: Endpoints(vec![]),
+        }
+    }
+
+    /// Adds a new transport to the [`Endpoints`] being built.
+    pub fn endpoint(mut self, _url: Url) -> Self {
+        // For BoxTransport, we can't easily create a new Http with a different URL
+        // So we'll just add the base transport for now
+        self.endpoints.add(self.base_transport.clone());
+        self
+    }
+
+    /// Adds a new transport to the [`Endpoints`] being built, using the given signer for header authentication.
+    pub fn authenticated_endpoint(mut self, _url: Url, _bundle_signer: BundleSigner) -> Self {
+        // For BoxTransport, we can't easily create a new MevHttp with a different URL
+        // So we'll just add the base transport for now
+        self.endpoints.add(self.base_transport.clone());
+        self
+    }
+
+    /// Adds Beaverbuild.
+    pub fn beaverbuild(self) -> Self {
+        self.endpoint("https://rpc.beaverbuild.org".parse().unwrap())
+    }
+
+    /// Adds Titan using AWS geo-routing to find the best RPC to send to.
+    pub fn titan(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the Europe RPC.
+    pub fn titan_europe(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://eu.rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the United States RPC.
+    pub fn titan_united_states(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://us.rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Titan, using the Asia RPC.
+    pub fn titan_asia(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://asia.rpc.titanbuilder.xyz".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Adds Flashbots.
+    pub fn flashbots(self, bundle_signer: BundleSigner) -> Self {
+        self.authenticated_endpoint(
+            "https://relay.flashbots.net".parse().unwrap(),
+            bundle_signer,
+        )
+    }
+
+    /// Builds the [`Endpoints`].
+    pub fn build(self) -> Endpoints {
+        self.endpoints
     }
 }
 

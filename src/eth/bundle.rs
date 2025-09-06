@@ -4,7 +4,7 @@ use alloy::{
     network::Network,
     primitives::{Bytes, B256},
     providers::Provider,
-    rpc::types::mev::{EthSendBundle, SendBundleResponse},
+    rpc::types::mev::{EthSendBundle, EthBundleHash},
     transports::{Transport, TransportResult},
 };
 
@@ -14,7 +14,7 @@ use crate::{BroadcastableCall, Endpoints};
 #[derive(Debug)]
 pub struct EthBundle<'a, P, T, N>
 where
-    P: Provider<T, N>,
+    P: Provider<N>,
     T: Transport + Clone,
     N: Network,
 {
@@ -25,7 +25,7 @@ where
 
 impl<'a, P, T, N> EthBundle<'a, P, T, N>
 where
-    P: Provider<T, N>,
+    P: Provider<N>,
     T: Transport + Clone,
     N: Network,
 {
@@ -82,7 +82,7 @@ where
 
     /// Submits a bundle to the given endpoints. It takes in a bundle and
     /// provides a bundle hash as a return value.
-    pub async fn send(self, endpoints: &Endpoints) -> Vec<TransportResult<SendBundleResponse>> {
+    pub async fn send(self, endpoints: &Endpoints) -> Vec<TransportResult<EthBundleHash>> {
         BroadcastableCall::new(
             endpoints,
             self.provider

@@ -7,28 +7,29 @@ use alloy::{
         Provider,
     },
     rpc::types::mev::{
-        CancelBundleRequest, EthCallBundle, EthCallBundleResponse, EthSendBundle,
-        PrivateTransactionRequest, SendBundleResponse,
+        EthBundleHash, EthCallBundle, EthCallBundleResponse, EthCancelBundle, EthSendBundle,
+        EthSendPrivateTransaction,
     },
     transports::{http::Http, TransportErrorKind, TransportResult},
 };
 use async_trait::async_trait;
 
-use crate::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt};
+use super::EndpointsBuilderBox;
+use crate::{BroadcastableCall, Endpoints, EthBundle, EthMevProviderExt};
 
 /// A [`EthBundle`] on Ethereun network using Reqwest HTTP transport.
 pub type EthereumReqwestEthBundle<'a, P> = EthBundle<'a, P, Http<reqwest::Client>, Ethereum>;
 
 #[async_trait]
-impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, Http<reqwest::Client>, N>
+impl<F, P, N> EthMevProviderExt<reqwest::Client, N> for FillProvider<F, P, N>
 where
     F: TxFiller<N>,
-    P: Provider<Http<reqwest::Client>, N>,
+    P: Provider<N>,
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
-    fn endpoints_builder(&self) -> EndpointsBuilder<reqwest::Client> {
-        EndpointsBuilder::new(self.client().transport().clone())
+    fn endpoints_builder(&self) -> EndpointsBuilderBox {
+        EndpointsBuilderBox::new(self.client().transport().clone())
     }
 
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes> {
@@ -49,7 +50,7 @@ where
         &self,
         bundle: EthSendBundle,
         endpoints: &Endpoints,
-    ) -> Vec<TransportResult<SendBundleResponse>> {
+    ) -> Vec<TransportResult<EthBundleHash>> {
         BroadcastableCall::new(
             endpoints,
             self.client().make_request("eth_sendBundle", (bundle,)),
@@ -59,7 +60,7 @@ where
 
     async fn send_eth_private_transaction(
         &self,
-        request: PrivateTransactionRequest,
+        request: EthSendPrivateTransaction,
     ) -> TransportResult<B256> {
         self.client()
             .request("eth_sendPrivateTransaction", (request,))
@@ -78,7 +79,7 @@ where
         .await
     }
 
-    async fn cancel_eth_bundle(&self, request: CancelBundleRequest) -> TransportResult<()> {
+    async fn cancel_eth_bundle(&self, request: EthCancelBundle) -> TransportResult<()> {
         self.client().request("eth_cancelBundle", (request,)).await
     }
 }

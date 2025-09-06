@@ -7,7 +7,7 @@ use alloy::{
     rpc::{
         client::RpcCall,
         types::mev::{
-            BundleItem, Privacy, SendBundleRequest, SendBundleResponse, SimBundleOverrides,
+            BundleItem, Privacy, MevSendBundle, EthBundleHash, SimBundleOverrides,
             SimBundleResponse, Validity,
         },
     },
@@ -15,38 +15,38 @@ use alloy::{
     transports::{http::Http, Transport, TransportResult},
 };
 
-use crate::MevHttp;
+use crate::transport::MevHttpBox;
 
 /// A MEV-Share bundle hat can be sent or simulated.
 #[derive(Debug)]
 pub struct MevShareBundle<'a, P, C, N, S>
 where
-    P: Provider<Http<C>, N>,
+    P: Provider<N>,
     C: Clone,
     N: Network,
     S: Signer + Send + Sync + 'static,
     Http<C>: Transport,
 {
     provider: &'a P,
-    bundle: SendBundleRequest,
+    bundle: MevSendBundle,
     bundle_signer: S,
     phantom: PhantomData<(C, N)>,
 }
 
 impl<'a, P, C, N, S> MevShareBundle<'a, P, C, N, S>
 where
-    P: Provider<Http<C>, N>,
+    P: Provider<N>,
     C: Clone,
     N: Network,
     S: Signer + Send + Sync + 'static,
     Http<C>: Transport,
-    MevHttp<C>: Transport,
+    MevHttpBox: Transport,
 {
     /// Creates a new [`MevShareBundle`].
     pub fn new(provider: &'a P, bundle_signer: S) -> Self {
         Self {
             provider,
-            bundle: SendBundleRequest::default(),
+            bundle: MevSendBundle::default(),
             bundle_signer,
             phantom: PhantomData,
         }
@@ -95,7 +95,7 @@ where
 
     /// Submits a bundle to the MEV-Share matchmaker. It takes in a bundle and
     /// provides a bundle hash as a return value.
-    pub async fn send(self) -> TransportResult<SendBundleResponse> {
+    pub async fn send(self) -> TransportResult<EthBundleHash> {
         let request = self
             .provider
             .client()
@@ -103,7 +103,7 @@ where
 
         RpcCall::new(
             request,
-            MevHttp::flashbots(
+            MevHttpBox::flashbots(
                 self.provider.client().transport().clone(),
                 self.bundle_signer,
             ),
@@ -125,7 +125,7 @@ where
 
         RpcCall::new(
             request,
-            MevHttp::flashbots(
+            MevHttpBox::flashbots(
                 self.provider.client().transport().clone(),
                 self.bundle_signer,
             ),

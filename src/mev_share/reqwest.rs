@@ -8,7 +8,7 @@ use alloy::{
     rpc::{
         client::RpcCall,
         types::mev::{
-            BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides,
+            BundleItem, MevSendBundle, EthBundleHash, SimBundleOverrides,
             SimBundleResponse,
         },
     },
@@ -17,7 +17,7 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-use crate::{MevHttp, MevShareBundle, MevShareProviderExt};
+use crate::{transport::MevHttpBox, MevShareBundle, MevShareProviderExt};
 
 /// A [`MevShareBundle`] on Ethereun network using Reqwest HTTP transport.
 pub type EthereumReqwestMevShareBundle<'a, P, S> =
@@ -25,10 +25,10 @@ pub type EthereumReqwestMevShareBundle<'a, P, S> =
 
 #[async_trait]
 impl<F, P, N> MevShareProviderExt<reqwest::Client, N>
-    for FillProvider<F, P, Http<reqwest::Client>, N>
+    for FillProvider<F, P, N>
 where
     F: TxFiller<N>,
-    P: Provider<Http<reqwest::Client>, N>,
+    P: Provider<N>,
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
@@ -60,9 +60,9 @@ where
 
     async fn send_mev_bundle<S>(
         &self,
-        bundle: SendBundleRequest,
+        bundle: MevSendBundle,
         signer: S,
-    ) -> TransportResult<SendBundleResponse>
+    ) -> TransportResult<EthBundleHash>
     where
         S: Signer + Clone + Send + Sync + 'static,
     {
@@ -70,14 +70,14 @@ where
 
         RpcCall::new(
             request,
-            MevHttp::flashbots(self.client().transport().clone(), signer),
+            MevHttpBox::flashbots(self.client().transport().clone(), signer),
         )
         .await
     }
 
     async fn sim_mev_bundle<S>(
         &self,
-        bundle: SendBundleRequest,
+        bundle: MevSendBundle,
         sim_overrides: SimBundleOverrides,
         signer: S,
     ) -> TransportResult<SimBundleResponse>
@@ -90,7 +90,7 @@ where
 
         RpcCall::new(
             request,
-            MevHttp::flashbots(self.client().transport().clone(), signer),
+            MevHttpBox::flashbots(self.client().transport().clone(), signer),
         )
         .await
     }
