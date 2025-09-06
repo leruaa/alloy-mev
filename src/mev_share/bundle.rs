@@ -7,7 +7,7 @@ use alloy::{
     rpc::{
         client::RpcCall,
         types::mev::{
-            BundleItem, Privacy, MevSendBundle, EthBundleHash, SimBundleOverrides,
+            BundleItem, EthBundleHash, MevSendBundle, Privacy, SimBundleOverrides,
             SimBundleResponse, Validity,
         },
     },
@@ -15,7 +15,7 @@ use alloy::{
     transports::{http::Http, Transport, TransportResult},
 };
 
-use crate::transport::MevHttpBox;
+use crate::transport::MevHttp;
 
 /// A MEV-Share bundle hat can be sent or simulated.
 #[derive(Debug)]
@@ -40,7 +40,7 @@ where
     N: Network,
     S: Signer + Send + Sync + 'static,
     Http<C>: Transport,
-    MevHttpBox: Transport,
+    MevHttp<C>: Transport,
 {
     /// Creates a new [`MevShareBundle`].
     pub fn new(provider: &'a P, bundle_signer: S) -> Self {
@@ -103,8 +103,14 @@ where
 
         RpcCall::new(
             request,
-            MevHttpBox::flashbots(
-                self.provider.client().transport().clone(),
+            MevHttp::flashbots(
+                self.provider
+                    .client()
+                    .transport()
+                    .as_any()
+                    .downcast_ref::<Http<C>>()
+                    .expect("Expected Http<C> transport, but got different type")
+                    .clone(),
                 self.bundle_signer,
             ),
         )
@@ -125,8 +131,14 @@ where
 
         RpcCall::new(
             request,
-            MevHttpBox::flashbots(
-                self.provider.client().transport().clone(),
+            MevHttp::flashbots(
+                self.provider
+                    .client()
+                    .transport()
+                    .as_any()
+                    .downcast_ref::<Http<C>>()
+                    .expect("Expected Http<C> transport, but got different type")
+                    .clone(),
                 self.bundle_signer,
             ),
         )

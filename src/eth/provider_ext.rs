@@ -12,7 +12,7 @@ use async_trait::async_trait;
 
 use crate::EthBundle;
 
-use super::{Endpoints, EndpointsBuilderBox};
+use super::{Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
@@ -24,7 +24,7 @@ where
 {
     /// Returns a [`EndpointsBuilder`] that can be used to build a new
     /// [`Endpoints`].
-    fn endpoints_builder(&self) -> EndpointsBuilderBox;
+    fn endpoints_builder(&self) -> EndpointsBuilder<C>;
 
     /// Sign and encode a transaction request.
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes>;

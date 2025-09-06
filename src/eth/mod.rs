@@ -5,7 +5,6 @@ mod bundle;
 pub use bundle::EthBundle;
 
 mod endpoints;
-pub(crate) use endpoints::EndpointsBuilderBox;
 pub use endpoints::{Endpoints, EndpointsBuilder};
 
 mod provider_ext;

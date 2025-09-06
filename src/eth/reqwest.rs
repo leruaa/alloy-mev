@@ -14,8 +14,7 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-use super::EndpointsBuilderBox;
-use crate::{BroadcastableCall, Endpoints, EthBundle, EthMevProviderExt};
+use crate::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt};
 
 /// A [`EthBundle`] on Ethereun network using Reqwest HTTP transport.
 pub type EthereumReqwestEthBundle<'a, P> = EthBundle<'a, P, Http<reqwest::Client>, Ethereum>;
@@ -28,8 +27,16 @@ where
     N: Network,
     <N as Network>::TxEnvelope: Encodable2718 + Clone,
 {
-    fn endpoints_builder(&self) -> EndpointsBuilderBox {
-        EndpointsBuilderBox::new(self.client().transport().clone())
+    fn endpoints_builder(&self) -> EndpointsBuilder<reqwest::Client> {
+        let base_transport = self
+            .client()
+            .transport()
+            .as_any()
+            .downcast_ref::<Http<reqwest::Client>>()
+            .expect("Expected Http<reqwest::Client> transport, but got different type")
+            .clone();
+
+        EndpointsBuilder::new(base_transport)
     }
 
     async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes> {

@@ -8,8 +8,7 @@ use alloy::{
     rpc::{
         client::RpcCall,
         types::mev::{
-            BundleItem, MevSendBundle, EthBundleHash, SimBundleOverrides,
-            SimBundleResponse,
+            BundleItem, EthBundleHash, MevSendBundle, SimBundleOverrides, SimBundleResponse,
         },
     },
     signers::Signer,
@@ -17,15 +16,14 @@ use alloy::{
 };
 use async_trait::async_trait;
 
-use crate::{transport::MevHttpBox, MevShareBundle, MevShareProviderExt};
+use crate::{transport::MevHttp, MevShareBundle, MevShareProviderExt};
 
 /// A [`MevShareBundle`] on Ethereun network using Reqwest HTTP transport.
 pub type EthereumReqwestMevShareBundle<'a, P, S> =
     MevShareBundle<'a, P, Http<reqwest::Client>, Ethereum, S>;
 
 #[async_trait]
-impl<F, P, N> MevShareProviderExt<reqwest::Client, N>
-    for FillProvider<F, P, N>
+impl<F, P, N> MevShareProviderExt<reqwest::Client, N> for FillProvider<F, P, N>
 where
     F: TxFiller<N>,
     P: Provider<N>,
@@ -70,7 +68,15 @@ where
 
         RpcCall::new(
             request,
-            MevHttpBox::flashbots(self.client().transport().clone(), signer),
+            MevHttp::flashbots(
+                self.client()
+                    .transport()
+                    .as_any()
+                    .downcast_ref::<Http<reqwest::Client>>()
+                    .expect("Expected Http<reqwest::Client> transport, but got different type")
+                    .clone(),
+                signer,
+            ),
         )
         .await
     }
@@ -90,7 +96,15 @@ where
 
         RpcCall::new(
             request,
-            MevHttpBox::flashbots(self.client().transport().clone(), signer),
+            MevHttp::flashbots(
+                self.client()
+                    .transport()
+                    .as_any()
+                    .downcast_ref::<Http<reqwest::Client>>()
+                    .expect("Expected Http<reqwest::Client> transport, but got different type")
+                    .clone(),
+                signer,
+            ),
         )
         .await
     }
