@@ -2,7 +2,7 @@ use alloy::{
     network::Network,
     providers::Provider,
     rpc::types::mev::{
-        BundleItem, SendBundleRequest, SendBundleResponse, SimBundleOverrides, SimBundleResponse,
+        BundleItem, MevSendBundle, EthBundleHash, SimBundleOverrides, SimBundleResponse,
     },
     signers::Signer,
     transports::{http::Http, Transport, TransportResult},
@@ -13,7 +13,7 @@ use crate::MevShareBundle;
 
 /// Extension trait for sending and simulate MEV-Share bundles.
 #[async_trait]
-pub trait MevShareProviderExt<C, N>: Provider<Http<C>, N> + Sized
+pub trait MevShareProviderExt<C, N>: Provider<N> + Sized
 where
     C: Clone,
     N: Network,
@@ -35,9 +35,9 @@ where
     /// provides a bundle hash as a return value.
     async fn send_mev_bundle<S>(
         &self,
-        bundle: SendBundleRequest,
+        bundle: MevSendBundle,
         signer: S,
-    ) -> TransportResult<SendBundleResponse>
+    ) -> TransportResult<EthBundleHash>
     where
         S: Signer + Clone + Send + Sync + 'static;
 
@@ -46,7 +46,7 @@ where
     /// can be simulated.
     async fn sim_mev_bundle<S>(
         &self,
-        bundle: SendBundleRequest,
+        bundle: MevSendBundle,
         sim_overrides: SimBundleOverrides,
         signer: S,
     ) -> TransportResult<SimBundleResponse>

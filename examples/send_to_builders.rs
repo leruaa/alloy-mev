@@ -19,9 +19,8 @@ async fn main() -> Result<()> {
     let tx_signer = EthereumWallet::new(bundle_signer.clone());
 
     let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
         .wallet(tx_signer.clone())
-        .on_http(eth_rpc.parse()?);
+        .connect_http(eth_rpc.parse()?);
 
     // Select which builders the bundle will be sent to
     let endpoints = provider
@@ -47,6 +46,11 @@ async fn main() -> Result<()> {
                 max_timestamp: None,
                 reverting_tx_hashes: vec![],
                 replacement_uuid: None,
+                dropping_tx_hashes: vec![],
+                refund_percent: None,
+                refund_recipient: None,
+                refund_tx_hashes: vec![],
+                extra_fields: Default::default(),
             },
             &endpoints,
         )

@@ -5,7 +5,7 @@ use alloy::{
     primitives::{address, U256},
     providers::{Provider, ProviderBuilder},
     rpc::types::{
-        mev::{Inclusion, SendBundleRequest},
+        mev::{Inclusion, MevSendBundle},
         TransactionRequest,
     },
     signers::local::PrivateKeySigner,
@@ -27,9 +27,8 @@ async fn main() -> Result<()> {
 
     // Build a provider with MEV
     let provider = ProviderBuilder::new()
-        .with_recommended_fillers()
         .wallet(tx_signer.clone())
-        .on_http(eth_rpc.parse()?);
+        .connect_http(eth_rpc.parse()?);
 
     // Pay Vitalik using a MEV-Share bundle!
     let tx = TransactionRequest::default()
@@ -37,7 +36,7 @@ async fn main() -> Result<()> {
         .value(U256::from(1000000000));
 
     // Build a bundle...
-    let bundle = SendBundleRequest {
+    let bundle = MevSendBundle {
         bundle_body: vec![provider.build_bundle_item(tx, false).await?],
         inclusion: Inclusion::at_block(provider.get_block_number().await? + 1),
         ..Default::default()

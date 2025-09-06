@@ -24,7 +24,7 @@ impl Endpoints {
     }
 
     /// Returns an iterator over the transports.
-    pub fn iter(&self) -> Iter<BoxTransport> {
+    pub fn iter(&self) -> Iter<'_, BoxTransport> {
         self.0.iter()
     }
 }
