@@ -21,8 +21,6 @@ jobs:
           - "stable"
           - "nightly"
         flags:
-          # No features
-          - "--no-default-features"
           # Default features
           - ""
           # All features
