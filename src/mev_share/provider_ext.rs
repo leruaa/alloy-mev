@@ -1,35 +1,25 @@
 use alloy::{
     network::Network,
-    providers::Provider,
-    rpc::types::mev::{
-        BundleItem, MevSendBundle, EthBundleHash, SimBundleOverrides, SimBundleResponse,
+    providers::{ext::MevBuilder, Provider},
+    rpc::{
+        client::RpcClient,
+        types::mev::{EthBundleHash, MevSendBundle, SimBundleOverrides, SimBundleResponse},
     },
     signers::Signer,
-    transports::{http::Http, Transport, TransportResult},
+    transports::TransportResult,
 };
 use async_trait::async_trait;
 
-use crate::MevShareBundle;
+use crate::mev_share::{MevShareBundleBuilder, FLASHBOTS_RELAY_RPC_URL};
 
 /// Extension trait for sending and simulate MEV-Share bundles.
 #[async_trait]
-pub trait MevShareProviderExt<C, N>: Provider<N> + Sized
+pub trait MevShareProviderExt<N>: Provider<N> + Sized
 where
-    C: Clone,
     N: Network,
-    Http<C>: Transport,
 {
-    /// Builds a bundle item from a transaction request.
-    async fn build_bundle_item(
-        &self,
-        tx: N::TransactionRequest,
-        can_revert: bool,
-    ) -> TransportResult<BundleItem>;
-
-    /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
-    fn build_bundle<S>(&self, bundle_signer: S) -> MevShareBundle<'_, Self, C, N, S>
-    where
-        S: Signer + Send + Sync + 'static;
+    /// Returns a builder-style [`MevShareBundleBuilder`] that can be sent or simulated.
+    fn bundle_builder(&self) -> MevShareBundleBuilder<'_, Self, N>;
 
     /// Submits a bundle to the MEV-Share matchmaker. It takes in a bundle and
     /// provides a bundle hash as a return value.
@@ -52,4 +42,44 @@ where
     ) -> TransportResult<SimBundleResponse>
     where
         S: Signer + Clone + Send + Sync + 'static;
+}
+
+#[async_trait]
+impl<P, N> MevShareProviderExt<N> for P
+where
+    N: Network,
+    P: Provider<N>,
+{
+    fn bundle_builder(&self) -> MevShareBundleBuilder<'_, Self, N> {
+        MevShareBundleBuilder::new(self)
+    }
+
+    async fn send_mev_bundle<S>(
+        &self,
+        bundle: MevSendBundle,
+        signer: S,
+    ) -> TransportResult<EthBundleHash>
+    where
+        S: Signer + Clone + Send + Sync + 'static,
+    {
+        let client = RpcClient::new_http(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
+        let request = client.request("mev_sendBundle", (bundle,));
+
+        MevBuilder::new_rpc(request).with_auth(signer).await
+    }
+
+    async fn sim_mev_bundle<S>(
+        &self,
+        bundle: MevSendBundle,
+        sim_overrides: SimBundleOverrides,
+        signer: S,
+    ) -> TransportResult<SimBundleResponse>
+    where
+        S: Signer + Clone + Send + Sync + 'static,
+    {
+        let client = RpcClient::new_http(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
+        let request = client.request("mev_simBundle", (bundle, sim_overrides));
+
+        MevBuilder::new_rpc(request).with_auth(signer).await
+    }
 }

@@ -3,11 +3,8 @@ use std::env;
 use alloy::{
     network::EthereumWallet,
     primitives::{address, U256},
-    providers::{Provider, ProviderBuilder},
-    rpc::types::{
-        mev::{Inclusion, MevSendBundle},
-        TransactionRequest,
-    },
+    providers::ProviderBuilder,
+    rpc::types::TransactionRequest,
     signers::local::PrivateKeySigner,
 };
 use alloy_mev::MevShareProviderExt;
@@ -36,11 +33,11 @@ async fn main() -> Result<()> {
         .value(U256::from(1000000000));
 
     // Build a bundle...
-    let bundle = MevSendBundle {
-        bundle_body: vec![provider.build_bundle_item(tx, false).await?],
-        inclusion: Inclusion::at_block(provider.get_block_number().await? + 1),
-        ..Default::default()
-    };
+    let bundle = provider
+        .bundle_builder()
+        .add_transaction(tx, false)
+        .await?
+        .build();
 
     // ... and send it!
     let response = provider.send_mev_bundle(bundle, bundle_signer).await?;

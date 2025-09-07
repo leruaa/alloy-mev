@@ -13,10 +13,10 @@ mod eth;
 pub use eth::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt};
 
 mod mev_share;
-pub use mev_share::{MevShareBundle, MevShareProviderExt};
+pub use mev_share::{MevShareBundleBuilder, MevShareProviderExt};
 
 mod transport;
 pub use transport::{BundleSigner, MevHttp};
 
 #[cfg(feature = "reqwest")]
-pub use {eth::EthereumReqwestEthBundle, mev_share::EthereumReqwestMevShareBundle};
+pub use eth::EthereumReqwestEthBundle;

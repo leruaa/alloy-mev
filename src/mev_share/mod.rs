@@ -1,10 +1,7 @@
-mod bundle;
-pub use bundle::MevShareBundle;
+mod bundle_builder;
+pub use bundle_builder::MevShareBundleBuilder;
 
 mod provider_ext;
 pub use provider_ext::MevShareProviderExt;
 
-#[cfg(feature = "reqwest")]
-mod reqwest;
-#[cfg(feature = "reqwest")]
-pub use reqwest::EthereumReqwestMevShareBundle;
+const FLASHBOTS_RELAY_RPC_URL: &str = "https://relay.flashbots.net";
