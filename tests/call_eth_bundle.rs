@@ -10,7 +10,6 @@ use alloy::{
 use alloy_mev::EthMevProviderExt;
 use dotenv::dotenv;
 
-#[cfg(feature = "reqwest")]
 #[tokio::test]
 async fn test_call_eth_bundle() {
     dotenv().ok();
