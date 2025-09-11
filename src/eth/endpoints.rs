@@ -1,69 +1,62 @@
-use std::slice::Iter;
+use std::{fmt::Debug, slice::Iter};
 
-use alloy::transports::{http::Http, BoxTransport, Transport};
+use alloy::signers::Signer;
+use dyn_clone::DynClone;
 use url::Url;
 
-use crate::{BundleSigner, MevHttp};
-
 /// Stores a list of transports that can be used to broadcast a request to.
-#[derive(Debug)]
-pub struct Endpoints(Vec<BoxTransport>);
+#[derive(Default, Debug)]
+pub struct Endpoints(Vec<Endpoint>);
 
 impl Endpoints {
     /// Returns the associated builder.
-    pub const fn builder<C>(http: Http<C>) -> EndpointsBuilder<C>
-    where
-        C: Clone,
-    {
-        EndpointsBuilder::new(http)
+    pub fn builder() -> EndpointsBuilder {
+        EndpointsBuilder::default()
     }
 
     /// Adds the given transport.
-    pub fn add(&mut self, transport: BoxTransport) {
-        self.0.push(transport)
+    pub fn add(&mut self, endpoint: Endpoint) {
+        self.0.push(endpoint)
     }
 
     /// Returns an iterator over the transports.
-    pub fn iter(&self) -> Iter<'_, BoxTransport> {
+    pub fn iter(&self) -> Iter<'_, Endpoint> {
         self.0.iter()
     }
 }
 
+pub trait ClonableSigner: Signer + DynClone + Send + Sync + Debug + 'static {}
+
+impl<T> ClonableSigner for T where T: Signer + Clone + Send + Sync + Debug + 'static {}
+
+dyn_clone::clone_trait_object!(ClonableSigner);
+
+#[derive(Debug, Clone)]
+pub struct Endpoint {
+    pub url: Url,
+    pub signer: Option<Box<dyn ClonableSigner>>,
+}
+
 /// An [`Endpoints`] builder.
-#[derive(Debug)]
-pub struct EndpointsBuilder<C> {
-    base_transport: Http<C>,
+#[derive(Default, Debug)]
+pub struct EndpointsBuilder {
     endpoints: Endpoints,
 }
 
-impl<C> EndpointsBuilder<C> {
-    /// Creates a new builder.
-    pub const fn new(base_transport: Http<C>) -> Self {
-        Self {
-            base_transport,
-            endpoints: Endpoints(vec![]),
-        }
-    }
-}
-
-impl<C> EndpointsBuilder<C>
-where
-    C: Clone,
-    Http<C>: Transport,
-    MevHttp<C>: Transport,
-{
+impl EndpointsBuilder {
     /// Adds a new transport to the [`Endpoints`] being built.
     pub fn endpoint(mut self, url: Url) -> Self {
-        self.endpoints
-            .add(Http::with_client(self.base_transport.client().clone(), url).boxed());
+        self.endpoints.add(Endpoint { url, signer: None });
 
         self
     }
 
     /// Adds a new transport to the [`Endpoints`] being built, using the given signer for header authentication.
-    pub fn authenticated_endpoint(mut self, url: Url, bundle_signer: BundleSigner) -> Self {
-        self.endpoints
-            .add(MevHttp::new(url, self.base_transport.clone(), bundle_signer).boxed());
+    pub fn authenticated_endpoint<S: ClonableSigner>(mut self, url: Url, signer: S) -> Self {
+        self.endpoints.add(Endpoint {
+            url,
+            signer: Some(Box::new(signer)),
+        });
 
         self
     }
@@ -82,7 +75,7 @@ where
     /// [`titan_europe`]: EndpointsBuilder::titan_europe
     /// [`titan_united_states`]: EndpointsBuilder::titan_united_states
     /// [`titan_asia`]: EndpointsBuilder::titan_asia
-    pub fn titan(self, bundle_signer: BundleSigner) -> Self {
+    pub fn titan<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
             "https://rpc.titanbuilder.xyz".parse().unwrap(),
             bundle_signer,
@@ -90,7 +83,7 @@ where
     }
 
     /// Adds Titan, using the Europe RPC.
-    pub fn titan_europe(self, bundle_signer: BundleSigner) -> Self {
+    pub fn titan_europe<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
             "https://eu.rpc.titanbuilder.xyz".parse().unwrap(),
             bundle_signer,
@@ -98,7 +91,7 @@ where
     }
 
     /// Adds Titan, using the United States RPC.
-    pub fn titan_united_states(self, bundle_signer: BundleSigner) -> Self {
+    pub fn titan_united_states<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
             "https://us.rpc.titanbuilder.xyz".parse().unwrap(),
             bundle_signer,
@@ -106,7 +99,7 @@ where
     }
 
     /// Adds Titan, using the Asia RPC.
-    pub fn titan_asia(self, bundle_signer: BundleSigner) -> Self {
+    pub fn titan_asia<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
             "https://as.rpc.titanbuilder.xyz".parse().unwrap(),
             bundle_signer,
@@ -119,7 +112,7 @@ where
     }
 
     /// Adds Flashbots.
-    pub fn flashbots(self, bundle_signer: BundleSigner) -> Self {
+    pub fn flashbots<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
             "https://relay.flashbots.net".parse().unwrap(),
             bundle_signer,

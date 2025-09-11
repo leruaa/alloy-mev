@@ -7,7 +7,7 @@ use alloy::{
     rpc::types::{mev::EthCallBundle, BlockNumberOrTag},
     signers::local::PrivateKeySigner,
 };
-use alloy_mev::{BundleSigner, EthMevProviderExt};
+use alloy_mev::EthMevProviderExt;
 use dotenv::dotenv;
 
 #[cfg(feature = "reqwest")]
@@ -24,7 +24,7 @@ async fn test_call_eth_bundle() {
 
     let endpoints = provider
         .endpoints_builder()
-        .flashbots(BundleSigner::flashbots(signer.clone()))
+        .flashbots(signer.clone())
         .build();
 
     let block_number = 20247245;

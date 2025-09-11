@@ -1,36 +1,31 @@
 use alloy::{
     network::Network,
-    primitives::{Bytes, B256},
+    primitives::B256,
     providers::Provider,
     rpc::types::mev::{
         EthBundleHash, EthCallBundle, EthCallBundleResponse, EthCancelBundle, EthSendBundle,
         EthSendPrivateTransaction,
     },
-    transports::{http::Http, Transport, TransportResult},
+    transports::TransportResult,
 };
 use async_trait::async_trait;
 
-use crate::EthBundle;
+use crate::{eth::EthBundleBuilder, BroadcastableCall};
 
 use super::{Endpoints, EndpointsBuilder};
 
 /// Extension trait for sending and simulate eth bundles.
 #[async_trait]
-pub trait EthMevProviderExt<C, N>: Provider<N> + Sized
+pub trait EthMevProviderExt<N>: Provider<N> + Sized
 where
-    C: Clone,
     N: Network,
-    Http<C>: Transport,
 {
     /// Returns a [`EndpointsBuilder`] that can be used to build a new
     /// [`Endpoints`].
-    fn endpoints_builder(&self) -> EndpointsBuilder<C>;
+    fn endpoints_builder(&self) -> EndpointsBuilder;
 
-    /// Sign and encode a transaction request.
-    async fn encode_request(&self, tx: N::TransactionRequest) -> TransportResult<Bytes>;
-
-    /// Returns a builder-style [`MevShareBundle`] that can be sent or simulated.
-    fn build_bundle(&self) -> EthBundle<'_, Self, Http<C>, N>;
+    /// Returns a builder-style [`EthBundleBuilder`] that can be sent or simulated.
+    fn bundle_builder(&self) -> EthBundleBuilder<'_, Self, N>;
 
     /// Submits a bundle to one or more builder(s). It takes in a bundle and
     /// provides a bundle hash as a return value.
@@ -56,4 +51,56 @@ where
 
     /// Cancels a previously submitted bundle.
     async fn cancel_eth_bundle(&self, request: EthCancelBundle) -> TransportResult<()>;
+}
+
+#[async_trait]
+impl<P, N> EthMevProviderExt<N> for P
+where
+    P: Provider<N>,
+    N: Network,
+{
+    fn endpoints_builder(&self) -> EndpointsBuilder {
+        EndpointsBuilder::default()
+    }
+
+    fn bundle_builder(&self) -> EthBundleBuilder<'_, Self, N> {
+        EthBundleBuilder::new(self)
+    }
+
+    async fn send_eth_bundle(
+        &self,
+        bundle: EthSendBundle,
+        endpoints: &Endpoints,
+    ) -> Vec<TransportResult<EthBundleHash>> {
+        BroadcastableCall::new(
+            endpoints,
+            self.client().make_request("eth_sendBundle", (bundle,)),
+        )
+        .await
+    }
+
+    async fn send_eth_private_transaction(
+        &self,
+        request: EthSendPrivateTransaction,
+    ) -> TransportResult<B256> {
+        self.client()
+            .request("eth_sendPrivateTransaction", (request,))
+            .await
+    }
+
+    async fn call_eth_bundle(
+        &self,
+        bundle: EthCallBundle,
+        endpoints: &Endpoints,
+    ) -> Vec<TransportResult<EthCallBundleResponse>> {
+        BroadcastableCall::new(
+            endpoints,
+            self.client().make_request("eth_callBundle", (bundle,)),
+        )
+        .await
+    }
+
+    async fn cancel_eth_bundle(&self, request: EthCancelBundle) -> TransportResult<()> {
+        self.client().request("eth_cancelBundle", (request,)).await
+    }
 }

@@ -1,35 +1,35 @@
 use std::marker::PhantomData;
 
 use alloy::{
+    eips::Encodable2718,
     network::Network,
     primitives::{Bytes, B256},
-    providers::Provider,
-    rpc::types::mev::{EthSendBundle, EthBundleHash},
-    transports::{Transport, TransportResult},
+    providers::{
+        fillers::{FillProvider, TxFiller},
+        Provider,
+    },
+    rpc::types::mev::EthSendBundle,
+    transports::{TransportErrorKind, TransportResult},
 };
-
-use crate::{BroadcastableCall, Endpoints};
 
 /// A bundle that can be sent to one or more builder(s).
 #[derive(Debug)]
-pub struct EthBundle<'a, P, T, N>
+pub struct EthBundleBuilder<'a, P, N>
 where
     P: Provider<N>,
-    T: Transport + Clone,
     N: Network,
 {
     provider: &'a P,
     bundle: EthSendBundle,
-    phantom: PhantomData<(T, N)>,
+    phantom: PhantomData<N>,
 }
 
-impl<'a, P, T, N> EthBundle<'a, P, T, N>
+impl<'a, P, N> EthBundleBuilder<'a, P, N>
 where
     P: Provider<N>,
-    T: Transport + Clone,
     N: Network,
 {
-    /// Creates a new [`EthBundle`]
+    /// Creates a new [`EthBundleBuilder`].
     pub fn new(provider: &'a P) -> Self {
         Self {
             provider,
@@ -39,7 +39,7 @@ where
     }
 
     /// Adds a hex-encoded signed transaction.
-    pub fn add_tx(mut self, tx: Bytes) -> Self {
+    pub fn add_signed_transaction(mut self, tx: Bytes) -> Self {
         self.bundle.txs.push(tx);
 
         self
@@ -80,15 +80,27 @@ where
         self
     }
 
-    /// Submits a bundle to the given endpoints. It takes in a bundle and
-    /// provides a bundle hash as a return value.
-    pub async fn send(self, endpoints: &Endpoints) -> Vec<TransportResult<EthBundleHash>> {
-        BroadcastableCall::new(
-            endpoints,
-            self.provider
-                .client()
-                .make_request("eth_sendBundle", (self.bundle,)),
-        )
-        .await
+    /// Builds a [`EthSendBundle`].
+    pub fn build(self) -> EthSendBundle {
+        self.bundle
+    }
+}
+
+impl<'a, F, P, N> EthBundleBuilder<'a, FillProvider<F, P, N>, N>
+where
+    F: TxFiller<N>,
+    P: Provider<N>,
+    N: Network,
+{
+    /// Sign and encode a transaction request, and then add it to the bundle.
+    pub async fn add_transaction_request(self, tx: N::TransactionRequest) -> TransportResult<Self> {
+        let sendable = self.provider.fill(tx).await?;
+
+        if let Some(envelope) = sendable.as_envelope() {
+            let encoded = envelope.encoded_2718().into();
+            Ok(self.add_signed_transaction(encoded))
+        } else {
+            Err(TransportErrorKind::custom_str("No signer has been setup"))
+        }
     }
 }

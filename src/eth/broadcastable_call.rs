@@ -1,8 +1,9 @@
-use std::{fmt::Debug, marker::PhantomData, pin::Pin};
+use std::{fmt::Debug, future::IntoFuture, marker::PhantomData, pin::Pin};
 
 use alloy::{
+    providers::ext::MevBuilder,
     rpc::{
-        client::RpcCall,
+        client::{RpcCall, RpcClient},
         json_rpc::{Request, RpcObject},
     },
     transports::{BoxFuture, TransportResult},
@@ -29,7 +30,15 @@ where
     pub fn new(endpoints: &Endpoints, request: Request<Params>) -> Self {
         let calls = endpoints
             .iter()
-            .map(|mev_http| RpcCall::new(request.clone(), mev_http.clone()))
+            .map(|e| {
+                let client = RpcClient::new_http(e.url.clone());
+                let rpc_call = RpcCall::new(request.clone(), client.transport().clone());
+                let mut mev = MevBuilder::new_rpc(rpc_call);
+                if let Some(signer) = &e.signer {
+                    mev = mev.with_auth(signer.clone())
+                }
+                mev.into_future()
+            })
             .collect::<Vec<_>>();
 
         Self {

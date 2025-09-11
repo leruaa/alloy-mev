@@ -10,13 +10,12 @@
 #![cfg_attr(not(test), warn(unused_crate_dependencies))]
 
 mod eth;
-pub use eth::{BroadcastableCall, Endpoints, EndpointsBuilder, EthBundle, EthMevProviderExt};
+pub use eth::{
+    BroadcastableCall, Endpoints, EndpointsBuilder, EthBundleBuilder, EthMevProviderExt,
+};
 
 mod mev_share;
 pub use mev_share::{MevShareBundleBuilder, MevShareProviderExt};
 
 mod transport;
 pub use transport::{BundleSigner, MevHttp};
-
-#[cfg(feature = "reqwest")]
-pub use eth::EthereumReqwestEthBundle;

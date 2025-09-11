@@ -4,10 +4,10 @@ use alloy::{
     network::EthereumWallet,
     primitives::{address, U256},
     providers::{Provider, ProviderBuilder},
-    rpc::types::{mev::EthSendBundle, TransactionRequest},
+    rpc::types::TransactionRequest,
     signers::local::PrivateKeySigner,
 };
-use alloy_mev::{BundleSigner, EthMevProviderExt};
+use alloy_mev::EthMevProviderExt;
 use anyhow::Result;
 use dotenv::dotenv;
 
@@ -26,7 +26,7 @@ async fn main() -> Result<()> {
     let endpoints = provider
         .endpoints_builder()
         .beaverbuild()
-        .titan(BundleSigner::flashbots(bundle_signer.clone()))
+        .titan(bundle_signer.clone())
         .build();
 
     let block_number: u64 = provider.get_block_number().await?;
@@ -36,25 +36,15 @@ async fn main() -> Result<()> {
         .to(address!("d8dA6BF26964aF9D7eEd9e03E53415D37aA96045")) // vitalik.eth
         .value(U256::from(1000000000));
 
+    let bundle = provider
+        .bundle_builder()
+        .on_block(block_number + 1)
+        .add_transaction_request(tx)
+        .await?
+        .build();
+
     // Broadcast the bundle to all builders setup above!
-    let responses = provider
-        .send_eth_bundle(
-            EthSendBundle {
-                txs: vec![provider.encode_request(tx).await?],
-                block_number: block_number + 1,
-                min_timestamp: None,
-                max_timestamp: None,
-                reverting_tx_hashes: vec![],
-                replacement_uuid: None,
-                dropping_tx_hashes: vec![],
-                refund_percent: None,
-                refund_recipient: None,
-                refund_tx_hashes: vec![],
-                extra_fields: Default::default(),
-            },
-            &endpoints,
-        )
-        .await;
+    let responses = provider.send_eth_bundle(bundle, &endpoints).await;
 
     println!("{responses:#?}");
 
