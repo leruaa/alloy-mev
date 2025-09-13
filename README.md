@@ -15,7 +15,7 @@ some [examples] available.
 Add `alloy-mev` to your `Cargo.toml`:
 
 ```toml
-alloy-mev = "0.5"
+alloy-mev = "1.0.0"
 ```
 
 ## Features
