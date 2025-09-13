@@ -12,6 +12,7 @@ description = """
 Easily send transaction bundles using Alloy.
 """
 
+
 [dependencies]
 alloy = { version = "1.0.30", features = [
     "rpc",
@@ -24,7 +25,8 @@ alloy = { version = "1.0.30", features = [
     "transports",
     "transport-http",
     "signers",
-] }
+], default-features = false }
+cfg-if = "1.0.3"
 futures = "0.3"
 pin-project = "1.1"
 url = "2.5"
@@ -40,6 +42,11 @@ alloy = { version = "1.0.30", features = [
     "consensus",
     "signer-local",
 ] }
+
+[features]
+default = ["reqwest"]
+reqwest = ["alloy/reqwest"]
+hyper = ["alloy/hyper"]
 
 [package.metadata.docs.rs]
 cargo-args = ["-Zunstable-options", "-Zrustdoc-scrape-examples"]

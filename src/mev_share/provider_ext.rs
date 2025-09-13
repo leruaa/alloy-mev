@@ -1,16 +1,16 @@
 use alloy::{
     network::Network,
     providers::{ext::MevBuilder, Provider},
-    rpc::{
-        client::RpcClient,
-        types::mev::{EthBundleHash, MevSendBundle, SimBundleOverrides, SimBundleResponse},
-    },
+    rpc::types::mev::{EthBundleHash, MevSendBundle, SimBundleOverrides, SimBundleResponse},
     signers::Signer,
     transports::TransportResult,
 };
 use async_trait::async_trait;
 
-use crate::mev_share::{MevShareBundleBuilder, FLASHBOTS_RELAY_RPC_URL};
+use crate::{
+    mev_share::{MevShareBundleBuilder, FLASHBOTS_RELAY_RPC_URL},
+    utils::build_rpc_client,
+};
 
 /// Extension trait for sending and simulate MEV-Share bundles.
 #[async_trait]
@@ -62,7 +62,7 @@ where
     where
         S: Signer + Clone + Send + Sync + 'static,
     {
-        let client = RpcClient::new_http(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
+        let client = build_rpc_client(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
         let request = client.request("mev_sendBundle", (bundle,));
 
         MevBuilder::new_rpc(request).with_auth(signer).await
@@ -77,7 +77,7 @@ where
     where
         S: Signer + Clone + Send + Sync + 'static,
     {
-        let client = RpcClient::new_http(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
+        let client = build_rpc_client(FLASHBOTS_RELAY_RPC_URL.parse().unwrap());
         let request = client.request("mev_simBundle", (bundle, sim_overrides));
 
         MevBuilder::new_rpc(request).with_auth(signer).await

@@ -3,13 +3,15 @@ use std::{fmt::Debug, future::IntoFuture, marker::PhantomData, pin::Pin};
 use alloy::{
     providers::ext::MevBuilder,
     rpc::{
-        client::{RpcCall, RpcClient},
+        client::RpcCall,
         json_rpc::{Request, RpcObject},
     },
     transports::{BoxFuture, TransportResult},
 };
 use futures::{future::join_all, Future, FutureExt};
 use pin_project::pin_project;
+
+use crate::utils::build_rpc_client;
 
 use super::Endpoints;
 
@@ -31,7 +33,7 @@ where
         let calls = endpoints
             .iter()
             .map(|e| {
-                let client = RpcClient::new_http(e.url.clone());
+                let client = build_rpc_client(e.url.clone());
                 let rpc_call = RpcCall::new(request.clone(), client.transport().clone());
                 let mut mev = MevBuilder::new_rpc(rpc_call);
                 if let Some(signer) = &e.signer {
