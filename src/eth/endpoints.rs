@@ -111,6 +111,11 @@ impl EndpointsBuilder {
         self.endpoint("https://rsync-builder.xyz".parse().unwrap())
     }
 
+    /// Adds Zund (https://zundbuilder.com): open builder, no API key, signature optional.
+    pub fn zund(self) -> Self {
+        self.endpoint("https://zundbuilder.com".parse().unwrap())
+    }
+
     /// Adds Flashbots.
     pub fn flashbots<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
