@@ -111,6 +111,11 @@ impl EndpointsBuilder {
         self.endpoint("https://rsync-builder.xyz".parse().unwrap())
     }
 
+    /// Adds Aqua Builder.
+    pub fn aqua(self) -> Self {
+        self.endpoint("https://rpc.aquabuilder.online".parse().unwrap())
+    }
+
     /// Adds Flashbots.
     pub fn flashbots<S: ClonableSigner>(self, bundle_signer: S) -> Self {
         self.authenticated_endpoint(
